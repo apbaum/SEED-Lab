@@ -66,10 +66,10 @@ float actual_speed[2] = {0, 0};
 
 // Assigns variables to keep track of the previous positions on
 // the encoders.
-float prev_pos[2] = {0, 0};
+double prev_pos[2] = {0, 0};
 
 // This should be given from raspberry pi
-float desired_pos[2] = {0, 0};
+double desired_pos[2] = {0, 0};
 
 // Sets the target speed of the motors.
 float desired_speed[2] = {0, 0};
@@ -170,15 +170,15 @@ void setup() {
   // Initializes the times for the program.
   last_time_ms = millis();
   start_time_ms = last_time_ms;
-}
 
-// Runs the motors and collects data on the velocity of the motors.
-void loop() {
   // Keeps track of the position of both motors in radians.
   long pos_counts[2] = {0, 0};
   long actual_pos[2] = {0, 0};
   long actual_speed[2] = {0, 0};
+}
 
+// Runs the motors and collects data on the velocity of the motors.
+void loop() {  
   // These variables are used for the control system and are important
   // for the feedback control loop in the system. Due to the nature of
   // the motors, the Kp value here is the maximum Kp that allows the
@@ -203,7 +203,7 @@ void loop() {
   for (int j = 0; j < 2; j++) {
     pos_error[j] = desired_pos[j] - actual_pos[j];
     integral_error[j] = integral_error[j] + pos_error[j]*((float)desired_Ts_ms / 1000);
-    desired_speed[j] = Kp_pos * pos_error[j] * integral_error[j];
+    desired_speed[j] = Kp_pos * pos_error[j] + integral_error[j] * Ki;
     error[j] = desired_speed[j] - actual_speed[j];
     Voltage[j] = Kp_vel * error[j];
   }
