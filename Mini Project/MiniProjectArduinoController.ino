@@ -185,6 +185,7 @@ void loop() {
   // motors to run smoothly and not jitter the wheels excessively.
   float Kp_vel = 2.5;
   float Kp_pos = 2;
+  float Ki_pos = 3;
   float Battery_Voltage = 7.8;
   float Voltage[2] = {0, 0};
   unsigned int PWM[2] = {0, 0};
@@ -203,7 +204,7 @@ void loop() {
   for (int j = 0; j < 2; j++) {
     pos_error[j] = desired_pos[j] - actual_pos[j];
     integral_error[j] = integral_error[j] + pos_error[j]*((float)desired_Ts_ms / 1000);
-    desired_speed[j] = Kp_pos * pos_error[j] + integral_error[j] * Ki;
+    desired_speed[j] = Kp_pos * pos_error[j] + Ki_pos * integral_error[j];
     error[j] = desired_speed[j] - actual_speed[j];
     Voltage[j] = Kp_vel * error[j];
   }
