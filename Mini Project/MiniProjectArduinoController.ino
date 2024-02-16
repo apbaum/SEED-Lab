@@ -217,10 +217,29 @@ void loop() {
     msgLength = 0;
   }
 
+  // Sets desired position for moving the wheels.
+  if (quadrant == 0) {
+    desired_pos[0] = 0;
+    desired_pos[1] = 0;
+  }
+  else if (quadrant == 1) {
+    desired_pos[0] = 0;
+    desired_pos[1] = PI;
+  }
+  else if (quadrant == 2) {
+    desired_pos[0] = PI;
+    desired_pos[1] = PI;
+  }
+  else if (quadrant == 3) {
+    desired_pos[0] = PI;
+    desired_pos[1] = 0;
+  }
+
   // Calculates the current positions on the motors in radians.
   for (int i = 0; i < 2; i++) {
     pos_counts[i] = myEnc(i);
     actual_pos[i] = 2*PI*(float)pos_counts[i]/3200;
+    actual_pos[i] = actual_pos[i] % (2*PI);
 
     // Calculates the actual velocities in rad/sec on the motors.
     actual_speed[i] = (actual_pos[i] - prev_pos[i])/((float)desired_Ts_ms/1000);
