@@ -95,6 +95,16 @@ long counts[2] = {0, 0};
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 100;
 
+#include <Wire.h>
+#define MY_ADDR 8
+// Global variables to be used for I2C communication
+volatile uint8_t offset = 0;
+volatile uint8_t instruction[32] = {0};
+volatile uint8_t msgLength = 0;
+char stringInput[32] = {};
+volatile uint8_t reply = 0;
+int quadrant = 0;
+
 // Defines the Interrupt Service Routine for changes on channel A and 
 // determining the rotation on the encoder. This ISR is for motor 1.
 void countEncoder1() {
@@ -152,6 +162,14 @@ void setup() {
     prev_pos[j] = 0;
     desired_speed[j] = 0;
     actual_speed[j] = 0;
+
+  //the set up for recieving from the PI
+  pinMode(LED_BUILTIN, OUTPUT);
+  // Initialize I2C
+  Wire.begin(MY_ADDR);
+  // Set callbacks for I2C interrupts
+  Wire.onReceive(receive);
+  Wire.onRequest(request);
   }
 
   // Initializes ISRs for motors 1 and 2. The ISR will
@@ -189,6 +207,15 @@ void loop() {
   float Battery_Voltage = 7.8;
   float Voltage[2] = {0, 0};
   unsigned int PWM[2] = {0, 0};
+
+  // If there is data on the buffer from the PI, read it
+  if (msgLength > 0) {
+    if (offset==1) {
+      digitalWrite(LED_BUILTIN,instruction[0]);
+    }
+    printReceived();
+    msgLength = 0;
+  }
 
   // Calculates the current positions on the motors in radians.
   for (int i = 0; i < 2; i++) {
@@ -263,6 +290,33 @@ long myEnc(int motor) {
     }  
   }
 }
+
+// printReceived helps us see what data we are getting from the leader
+void printReceived() {
+  for (int i=0;i<msgLength;i++) {
+    stringInput[i] = instruction[i];
+    quadrant = instruction[i];
+  }
+}
+// function called when an I2C interrupt event happens
+void receive() {
+  // Set the offset, this will always be the first byte.
+  offset = Wire.read();
+  // If there is information after the offset, it is telling us more about the command.
+  while (Wire.available()) {
+    instruction[msgLength] = Wire.read();
+    msgLength++;
+    reply = instruction[0] + 100;
+  }
+}
+
+void request() {
+  // According to the Wire source code, we must call write() within therequesting ISR
+  // and nowhere else. Otherwise, the timing does not work out. See line 238:
+  // https://github.com/arduino/ArduinoCore-avr/blob/master/libraries/Wire/src/Wire.cpp
+  Wire.write(reply);
+  reply = 0;
+ }
 
 // ================
 // CODE ENDS HERE
