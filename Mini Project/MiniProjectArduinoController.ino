@@ -184,8 +184,8 @@ void loop() {
   // the motors, the Kp value here is the maximum Kp that allows the
   // motors to run smoothly and not jitter the wheels excessively.
   float Kp_vel = 2.5;
-  float Kp_pos = 2;
-  float Ki_pos = 3;
+  float Kp_pos = 18.3;
+  float Ki_pos = 53.73;
   float Battery_Voltage = 7.8;
   float Voltage[2] = {0, 0};
   unsigned int PWM[2] = {0, 0};
