@@ -1,1 +1,1 @@
-This folder contains reference code utilized for the mini project implementations.
+This folder contains reference code for the work done on the mini project.
