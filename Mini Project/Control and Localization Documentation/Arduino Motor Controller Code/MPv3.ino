@@ -1,4 +1,4 @@
-// Mini Project Controller Experiment Code
+// Mini Project Controller V3
 // ================
 // Author: Madeleine Houghton
 // Date: 2/14/2024
