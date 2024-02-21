@@ -297,13 +297,7 @@ void loop() {
   }
 }
 
-// ================
-// MYENC FUNCTION
-// ================
-// Adjusts the count on the channels to be more precise for both
-// motors 1 and 2. This function is called to help calculate the
-// current position on motors 1 and 2 and determine the velocity
-// of the motors for the feedback control loop and data display.
+// Adjust the count on both motor encoders and returns the count.
 long myEnc(int motor) {
   // Activates to adjust the count on the motor 1 encoder.
   if (motor == 1) {
