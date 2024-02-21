@@ -1,0 +1,1 @@
+This folder contains the MATLAB code for determining the gains for the PI controller, comparing simulated and experimental data, and simulating the PI controller to implement for the motor controller.
