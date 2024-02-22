@@ -226,8 +226,8 @@ void loop() {
     desired_pos[1] = 0;
   }
   else if (quadrant == 1) {
-    desired_pos[0] = PI;
-    desired_pos[1] = 0;
+    desired_pos[0] = 0;
+    desired_pos[1] = PI;
   }
   // Overshoot occurs in quadrant 2 when both wheels are moving.
   // Can subtract PI/4 to offset overshoot.
@@ -236,8 +236,8 @@ void loop() {
     desired_pos[1] = PI;
   }
   else if (quadrant == 3) {
-    desired_pos[0] = 0;
-    desired_pos[1] = PI;
+    desired_pos[0] = PI;
+    desired_pos[1] = 0;
   }
   
   // Calculates the current positions on the motors in radians.
