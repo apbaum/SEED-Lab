@@ -3,7 +3,8 @@
 // Author: Madeleine Houghton
 // Date: 2/14/2024
 // ================
-// Goal Description here
+// The purpose of this code is to receive
+// 
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
