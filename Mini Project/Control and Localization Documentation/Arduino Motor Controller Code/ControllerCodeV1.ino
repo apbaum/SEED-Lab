@@ -3,8 +3,10 @@
 // Author: Madeleine Houghton
 // Date: 2/14/2024
 // ================
-// The purpose of this code is to receive
-// 
+// The purpose of this code is to design a PI controller
+// for motors to have the motors move to a desired position.
+// This code is the first rendition of the final implementation.
+// The code also has drafts of Pi to Arduino communication.
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
@@ -38,13 +40,6 @@
 // ----------------
 //    Download and open code in Arduino sketch in Arduino IDE.
 //    Upload the code from the IDE to the Arduino board.
-//    
-//    To view data from the Arduino:
-//    FOR ARDUINO IDE:
-//        Open Serial Monitor with "Tools" in the IDE for outputs.
-//    FOR MATLAB:
-//        Run the ReadFromArduino.mlx file. Make sure in the IDE
-//        that the serial monitor is closed.
 
 // Resources
 // ----------------
@@ -53,7 +48,6 @@
 
 // ================
 // CODE BEGINS HERE
-// MINI PROJECT CONTROLLER
 // ================
 
 // Assigns timing variab;es for sampling the motor velocities.
@@ -72,7 +66,7 @@ double prev_pos[2] = {0, 0};
 // This should be given from raspberry pi
 double desired_pos[2] = {0, 0};
 
-// Sets the target speed of the motors.
+// Sets the target speed and position of the motors.
 float desired_speed[2] = {0, 0};
 float integral_error[2] = {0, 0};
 float pos_error[2] = {0, 0};
@@ -100,14 +94,15 @@ long counts[2] = {0, 0};
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 100;
 
+// Global variables to be used for I2C communication
 #include <Wire.h>
 #define MY_ADDR 8
-// Global variables to be used for I2C communication
 volatile uint8_t offset = 0;
 volatile uint8_t instruction[32] = {0};
 volatile uint8_t msgLength = 0;
 char stringInput[32] = {};
 volatile uint8_t reply = 0;
+// Initializes a starting position.
 int quadrant = 2;
 
 // Defines the Interrupt Service Routine for changes on channel A and 
@@ -168,11 +163,11 @@ void setup() {
     desired_speed[j] = 0;
     actual_speed[j] = 0;
 
-  //the set up for recieving from the PI
+  // Sets up for recieving from the PI.
   pinMode(LED_BUILTIN, OUTPUT);
-  // Initialize I2C
+  // Initialize I2C.
   Wire.begin(MY_ADDR);
-  // Set callbacks for I2C interrupts
+  // Set callbacks for I2C interrupts.
   Wire.onReceive(receive);
   Wire.onRequest(request);
   }
@@ -198,9 +193,7 @@ void setup() {
 // Runs the motors and collects data on the velocity of the motors.
 void loop() {  
   // These variables are used for the control system and are important
-  // for the feedback control loop in the system. Due to the nature of
-  // the motors, the Kp value here is the maximum Kp that allows the
-  // motors to run smoothly and not jitter the wheels excessively.
+  // for the feedback control loop in the system. 
   float Kp_vel = 2.5;
   float Kp_pos = 18.3;
   float Ki_pos = 53.73;
@@ -208,7 +201,7 @@ void loop() {
   float Voltage[2] = {0, 0};
   unsigned int PWM[2] = {0, 0};
 
-  // If there is data on the buffer from the PI, read it
+  // If there is data on the buffer from the PI, read it.
   if (msgLength > 0) {
     if (offset==1) {
       digitalWrite(LED_BUILTIN,instruction[0]);
@@ -248,7 +241,7 @@ void loop() {
     prev_pos[i] = actual_pos[i];
   }
 
-  // Controller loop
+  // Controller for aiming towards the desired position on both motors.
   for (int j = 0; j < 2; j++) {
     pos_error[j] = desired_pos[j] - actual_pos[j];
     integral_error[j] = integral_error[j] + pos_error[j]*((float)desired_Ts_ms / 1000);
@@ -257,8 +250,8 @@ void loop() {
     Voltage[j] = Kp_vel * error[j];
   }
 
+  // Sets the direction of the motors.
   for (int k = 0; k < 2; k++) {
-    // Corrects direction
     if (Voltage[k] > 0) {
       // Rotates the motors counter-clockwise.
       digitalWrite(VoltageSign[k], HIGH);   // For motor 1
@@ -277,8 +270,6 @@ void loop() {
     analogWrite(MotorVoltage[k], PWM[k]);
   }
 
-  Serial.println(MotorVoltage[1]);
-
   // Samples every desired sample rate.
   while (millis() < last_time_ms + desired_Ts_ms) {
     // Waits until desired time passes.
@@ -286,12 +277,11 @@ void loop() {
 }
 
 // ================
-// MYENC FUNCTION
+// FUNCTIONS
 // ================
+
 // Adjusts the count on the channels to be more precise for both
-// motors 1 and 2. This function is called to help calculate the
-// current position on motors 1 and 2 and determine the velocity
-// of the motors for the feedback control loop and data display.
+// motors 1 and 2. 
 long myEnc(int motor) {
   // Activates to adjust the count on the motor 1 encoder.
   if (motor == 1) {
@@ -314,14 +304,15 @@ long myEnc(int motor) {
   }
 }
 
-// printReceived helps us see what data we are getting from the leader
+// Sets what data will be received by Pi for data communication.
 void printReceived() {
   for (int i=0;i<msgLength;i++) {
     stringInput[i] = instruction[i];
     quadrant = instruction[i];
   }
 }
-// function called when an I2C interrupt event happens
+
+// Sends back quadrant if Pi needs to receive data from Arduino.
 void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
@@ -329,18 +320,18 @@ void receive() {
   while (Wire.available()) {
     instruction[msgLength] = Wire.read();
     msgLength++;
-    reply = instruction[0] + 100;
+    reply = quadrant;
   }
 }
 
+// Requests data to fix timing.
 void request() {
-  // According to the Wire source code, we must call write() within therequesting ISR
+  // According to the Wire source code, we must call write() within the requesting ISR
   // and nowhere else. Otherwise, the timing does not work out. See line 238:
   // https://github.com/arduino/ArduinoCore-avr/blob/master/libraries/Wire/src/Wire.cpp
   Wire.write(reply);
   reply = 0;
  }
-
 // ================
 // CODE ENDS HERE
 // ================
