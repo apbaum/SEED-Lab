@@ -1,9 +1,10 @@
-// Mini Project Controller V5 (Computer Vision Version)
+// Mini Project Finalized Controller (Computer Vision Version)
 // ================
 // Author: Madeleine Houghton
-// Date: 2/14/2024
+// Date: 2/21/2024
 // ================
-// Goal Description here
+// This code is the finalized design of a PI controller
+// for motor
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
@@ -52,7 +53,6 @@
 
 // ================
 // CODE BEGINS HERE
-// MINI PROJECT CONTROLLER
 // ================
 
 // Assigns timing variables for sampling the motor velocities.
