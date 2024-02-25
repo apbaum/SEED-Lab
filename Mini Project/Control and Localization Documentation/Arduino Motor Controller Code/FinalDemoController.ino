@@ -72,7 +72,7 @@ float actual_speed[2] = {0, 0};
 // the encoders.
 float prev_pos[2] = {0, 0};
 
-// This should be given from raspberry pi
+// This should be given from Raspberry Pi.
 float desired_pos[2] = {0, 0};
 
 // Sets the target speed of the motors.
@@ -103,9 +103,9 @@ long counts[2] = {0, 0};
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 100;
 
+// Global variables to be used for I2C communication.
 #include <Wire.h>
 #define MY_ADDR 8
-// Global variables to be used for I2C communication
 volatile uint8_t offset = 0;
 volatile uint8_t instruction[32] = {0};
 volatile uint8_t msgLength = 0;
@@ -169,11 +169,11 @@ void setup() {
     pinMode(Motor2Chan[j], INPUT_PULLUP);
   }
 
-  //the set up for recieving from the PI
+  // Sets up for recieving from the Pi.
   pinMode(LED_BUILTIN, OUTPUT);
-  // Initialize I2C
+  // Initialize I2C.
   Wire.begin(MY_ADDR);
-  // Set callbacks for I2C interrupts
+  // Set callbacks for I2C interrupts.
   Wire.onReceive(receive);
   Wire.onRequest(request);
 
@@ -197,9 +197,7 @@ void setup() {
 // Runs the motors and collects data on the velocity of the motors.
 void loop() {  
   // These variables are used for the control system and are important
-  // for the feedback control loop in the system. Due to the nature of
-  // the motors, the Kp value here is the maximum Kp that allows the
-  // motors to run smoothly and not jitter the wheels excessively.
+  // for the feedback control loop in the system.
   float Kp_vel = 2.5;
   float Kp_pos = 18.7;
   float Ki_pos = 4.5;
@@ -211,7 +209,7 @@ void loop() {
   // Updates last time program ran.
   last_time_ms = millis();
 
-  // If there is data on the buffer from the PI, read it
+  // If there is data on the buffer from the PI, read it.
   if (msgLength > 0) {
     if (offset == 1) {
       digitalWrite(LED_BUILTIN,instruction[0]);
@@ -232,8 +230,6 @@ void loop() {
     desired_pos[0] = 0;
     desired_pos[1] = PI;
   }
-  // Overshoot occurs in quadrant 2 when both wheels are moving.
-  // Can subtract PI/4 to offset overshoot.
   else if (quadrant == 2) {
     desired_pos[0] = PI;
     desired_pos[1] = PI;
@@ -253,7 +249,7 @@ void loop() {
     prev_pos[i] = actual_pos[i];
   }
 
-  // Controller loop
+// Controller for aiming towards the desired position on both motors.
   for (int j = 0; j < 2; j++) {
     pos_error[j] = desired_pos[j] - actual_pos[j];
     integral_error[j] = integral_error[j] + pos_error[j]*((float)desired_Ts_ms / 1000);
@@ -273,14 +269,13 @@ void loop() {
 
   // Sets speed and direction on motors.
   for (int k = 0; k < 2; k++) {
-    // Corrects direction
     if (Voltage[k] > 0) {
       // Rotates the motors counter-clockwise.
-      digitalWrite(VoltageSign[k], HIGH);   // For motor 1
+      digitalWrite(VoltageSign[k], HIGH);  
     }
     else {
       // Rotates the motors clockwise.
-      digitalWrite(VoltageSign[k], LOW);    // For motor 1
+      digitalWrite(VoltageSign[k], LOW);  
     }
 
     // Saturates the voltage to be within the batter voltage range.
@@ -300,12 +295,11 @@ void loop() {
 }
 
 // ================
-// MYENC FUNCTION
+// FUNCTIONS
 // ================
+
 // Adjusts the count on the channels to be more precise for both
-// motors 1 and 2. This function is called to help calculate the
-// current position on motors 1 and 2 and determine the velocity
-// of the motors for the feedback control loop and data display.
+// motors 1 and 2. 
 long myEnc(int motor) {
   // Activates to adjust the count on the motor 1 encoder.
   if (motor == 1) {
@@ -328,7 +322,7 @@ long myEnc(int motor) {
   }
 }
 
-// printReceived helps us see what data we are getting from the leader
+// Sets what data will be received by Pi for data communication.
 void printReceived() {
   for (int i = 0; i < msgLength; i++) {
     stringInput[i] = instruction[i];
@@ -336,7 +330,7 @@ void printReceived() {
   }
 }
 
-// function called when an I2C interrupt event happens
+// Sends back quadrant if Pi needs to receive data from Arduino.
 void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
@@ -348,6 +342,7 @@ void receive() {
   }
 }
 
+// Requests data to fix timing.
 void request() {
   // According to the Wire source code, we must call write() within the requesting ISR
   // and nowhere else. Otherwise, the timing does not work out. See line 238:
