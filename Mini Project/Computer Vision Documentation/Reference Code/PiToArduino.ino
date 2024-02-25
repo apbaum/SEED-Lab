@@ -1,4 +1,10 @@
 // Pi to Arduino Communication Code
+// Author: Adam Nussbaum
+
+// This code communicates from a Pi and an Arduino for the
+// Pi to send commands and the Arduino to respond to those
+// commands. In this code, the Pi sends a number and the Arduino
+// replies with the number received + 100.
 
 // Global variables to be used for I2C communication.
 #include <Wire.h>
