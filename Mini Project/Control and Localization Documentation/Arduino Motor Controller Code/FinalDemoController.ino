@@ -3,15 +3,21 @@
 // Author: Madeleine Houghton
 // Date: 2/21/2024
 // ================
-// This code is the finalized design of a PI controller
-// for motor
+// The purpose of this code is to design a PI controller
+// for two motors to move to a desired position.
+// This code is the final updated code before computer vision
+// integration and serves to verify remaining tuning of the
+// controller.
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
-// structure and wiring for the motors to the Arduino and
+// structure, wiring and communication requirements to a
+// Raspberry Pi, and wiring for the motors to the Arduino and
 // motor driver shield have been completed. Refer to Resources
 // for additional info on the motor and motor driver shield
-// wiring configurations. The hardware configuration mentioned
+// wiring configurations. Refer to Computer Vision SEED lab
+// tutorials on Pi to Arduino communication for additional
+// info. The hardware configuration mentioned
 // here are the minimum requirements to use the program
 // as intended. 
 
@@ -22,6 +28,7 @@
 //    x2 Motors with mounted wheels
 //    x1 Voltage Regulator
 //    x1 Battery Pack (~7.8 V) with fuse connector
+//    x1 Raspberry Pi
 
 // Hardware Configurations
 // ----------------
@@ -33,18 +40,14 @@
 //    Install the motor driver shield onto the Arduino.
 //    Make the necessary connections of the motor wires to the
 //    motor driver shield (refer to driver shield website).
+//    Make sure necessary wiring between the Raspberry Pi and
+//    Arduino is completed and data communication is working
+//    as expected.
 
 // How to Use Code
 // ----------------
 //    Download and open code in Arduino sketch in Arduino IDE.
 //    Upload the code from the IDE to the Arduino board.
-//    
-//    To view data from the Arduino:
-//    FOR ARDUINO IDE:
-//        Open Serial Monitor with "Tools" in the IDE for outputs.
-//    FOR MATLAB:
-//        Run the ReadFromArduino.mlx file. Make sure in the IDE
-//        that the serial monitor is closed.
 
 // Resources
 // ----------------
