@@ -4,7 +4,7 @@
 // Date: 2/15/2024
 // ================
 // The purpose of this code is to design a PI controller
-// for motors to have the motors move to a desired position.
+// for two motors to move to a desired position.
 // This code is an update of the first rendition and serves
 // to test the PI controller experimentally with the MATLAB
 // simulation. This does not include Pi to Arduino
