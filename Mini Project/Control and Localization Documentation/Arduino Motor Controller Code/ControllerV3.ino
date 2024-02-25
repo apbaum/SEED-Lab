@@ -4,7 +4,7 @@
 // Date: 2/19/2024
 // ================
 // The purpose of this code is to design a PI controller
-// for motors to have the motors move to a desired position.
+// for two motors to move to a desired position.
 // This code is the final updated code before computer vision
 // integration and serves to verify remaining tuning of the
 // controller.
