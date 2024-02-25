@@ -1,7 +1,7 @@
 // Mini Project Controller V2 Experiment Code
 // ================
 // Author: Madeleine Houghton
-// Date: 2/14/2024
+// Date: 2/15/2024
 // ================
 // The purpose of this code is to design a PI controller
 // for motors to have the motors move to a desired position.
