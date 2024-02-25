@@ -1,15 +1,15 @@
-%% MiniProjectControllerTesting
+%% RunControllerTesting.m
 % Mini Project
 %
 % Modified by: Madeleine Houghton
 %
-% Date: 2/23/2024
+% Date: 2/15/2024
 %
 % This script runs a simulation of a motor controller and plots the
 % results. The results plot experimental and simulated voltage vs. time 
-% and velocity vs. time data.
+% and position vs. time data.
 %
-% Required file: miniproject_controller.slx
+% Required file: ControllerDiagram.slx
 %
 % Loads in the Arduino step data for the motor controller program.
 load('stepData.mat');
@@ -19,12 +19,13 @@ Ki = 4.5;
 K=1.35; % DC gain [rad/Vs]
 sigma=9.7; % Time constant reciprocal [1/s]
 %% Run a Simulation
-open_system('miniproject_controller');
+open_system('ControllerDiagram');
 
 % Runs the motor controller simulation.
-out=sim('miniproject_controller');
+out=sim('ControllerDiagram');
 %% Plot the results from simulation and experimentation data
 
+% Plots voltages.
 figure
 subplot(2,1,1)
 plot(out.Voltage,'--','linewidth',2)
@@ -35,6 +36,7 @@ hold off
 xlabel('Time (s)')
 ylabel('Voltage (V)')
 
+% Plots positions.
 subplot(2,1,2)
 plot(out.Position,'--','linewidth',2)
 hold on
