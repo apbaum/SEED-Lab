@@ -1,3 +1,6 @@
+// Robot Position (Localization and Position)
+// Author: Quinn Hejmanowski
+
 // This is the code for localization. To set up, connect the CLK and DT (yellow and white) 
 // of the left motor to pins 3 and 6 and the right motor to 5 and 2.
 // Both encoders also need power, so connect both blue wires to Vcc and green to gnd
@@ -5,13 +8,14 @@
 // x position, y position, and angle to the serial moniter. Copy this to the 'data' variable
 // in the matlab code, and run that to see the animation. 
 
-
+// Sets pins.
 int LAPIN = 3;
 int LBPIN = 6;
 
 int RAPIN = 2;
 int RBPIN = 5;
 
+// Sets position, time, and other variables.
 long Lcount = 0;
 long Rcount = 0;
 
@@ -31,42 +35,44 @@ double currenty = 0;
 double lastx = 0;
 double lasty = 0;
 double width = 1.5;
-double encClicksToFeet = 4; //currently converting to inches instead of feet in the name of the animation looking precise. This number will likely need to be recalibrated
-
+double encClicksToFeet = 4; // Converting to inches instead of feet for precision. Number will likely need to be recalibrated.
 
 long i = 0;
 
+// Sets up pins and serial communication.
 void setup(){
+  // Sets pins.
   pinMode(LAPIN, INPUT_PULLUP);
   pinMode(LBPIN, INPUT_PULLUP);
   pinMode(RAPIN, INPUT_PULLUP);
   pinMode(RBPIN, INPUT_PULLUP);
 
+  // Sets interrupts.
   attachInterrupt(digitalPinToInterrupt(LAPIN), LARise, RISING);
   attachInterrupt(digitalPinToInterrupt(RAPIN), RARise, RISING);
 
- // Opens a serial connection
+ // Opens a serial connection.
   Serial.begin(9600);
   Serial.println("Started");
 }
 
+// Runs program.
 void loop(){
-
-  //this if statement ends the serial moniter after 5 seconds, so that it's easier to copy to matlab
+  // Ends the serial moniter after 5 seconds.
   if (sampletime*i/1000.0 > 5){
     Serial.end();
   }
 
-  // convert encoder clicks to feet
+  // Convert encoder clicks to feet.
   currentdl = LEncoder()/encClicksToFeet;
   currentdr = REncoder()/encClicksToFeet; 
 
-  // calculate the change in position and angle based on the encoder, and add to it previous values
+  // Calculate the change in position and angle based on the encoder, and add to it previous values.
   currentx = lastx + cos(lastangle)*(currentdl-lastdl+currentdr-lastdr)/2;
   currenty = lasty + sin(lastangle)*(currentdl-lastdl+currentdr-lastdr)/2;
   currentangle = lastangle + (currentdl-lastdl-currentdr+lastdr)/width;
 
-  // print the output in a format that is easy to copy into matlab
+  // Print the output.
   Serial.print(sampletime*i/1000.0);
   Serial.print('\t');
   Serial.print(currentx);
@@ -76,7 +82,7 @@ void loop(){
   Serial.print(currentangle);
   Serial.println(";");
 
-  // current values become previous values for next loop
+  // Current values become previous values for next loop.
   lastdl = currentdl;
   lastdr = currentdr;
   lastx = currentx;
@@ -85,16 +91,16 @@ void loop(){
 
   i++;
 
-  // debounce
+  // Debounce
   while (millis() < lastTime + sampletime) {}
   lastTime = millis();
 }
 
-  // the interupt for the left encoder
+// The interrupt for the left encoder.
 void LARise(){
   if(millis() > LInteruptTriggered + sampletime){
     LInteruptTriggered = millis();
- // implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
+   // If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise.
     if (digitalRead(LAPIN) == digitalRead(LBPIN)){
       Lcount = Lcount + 2;
     } else {
@@ -103,7 +109,7 @@ void LARise(){
   }
 }
 
-  // the function for reading the left encoder
+// The function for reading the left encoder.
 long LEncoder(){
   if (digitalRead(LAPIN) != digitalRead(LBPIN)){
     return (Lcount + 1);
@@ -112,11 +118,11 @@ long LEncoder(){
   }
 }
 
-  // the interupt for the right encoder
+// The interrupt for the right encoder.
 void RARise(){
   if(millis() > RInteruptTriggered + sampletime){
     RInteruptTriggered = millis();
- // implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
+ // If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise.
     if (digitalRead(RAPIN) == digitalRead(RBPIN)){
       Rcount = Rcount + 2;
     } else {
@@ -125,7 +131,7 @@ void RARise(){
   }
 }
 
-  // the function for reading the right encoder
+// The function for reading the right encoder.
 long REncoder(){
   if (digitalRead(RAPIN) != digitalRead(RBPIN)){
     return (Rcount + 1);
