@@ -4,7 +4,7 @@
 // Date: 2/14/2024
 // ================
 // The purpose of this code is to design a PI controller
-// for motors to have the motors move to a desired position.
+// for two motors to move to a desired position.
 // This code is the first rendition of the final implementation.
 // The code also has drafts of Pi to Arduino communication.
 
