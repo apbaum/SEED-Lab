@@ -3,7 +3,12 @@
 // Author: Madeleine Houghton
 // Date: 2/14/2024
 // ================
-// Goal Description here
+// The purpose of this code is to design a PI controller
+// for motors to have the motors move to a desired position.
+// This code is an update of the first rendition and serves
+// to test the PI controller experimentally with the MATLAB
+// simulation. This does not include Pi to Arduino
+// communication.
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
@@ -52,7 +57,6 @@
 
 // ================
 // CODE BEGINS HERE
-// MINI PROJECT CONTROLLER
 // ================
 
 // Assigns timing variables for sampling the motor velocities.
@@ -100,9 +104,9 @@ long counts[2] = {0, 0};
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 100;
 
+// Global variables to be used for I2C communication
 #include <Wire.h>
 #define MY_ADDR 8
-// Global variables to be used for I2C communication
 volatile uint8_t offset = 0;
 volatile uint8_t instruction[32] = {0};
 volatile uint8_t msgLength = 0;
@@ -169,11 +173,11 @@ void setup() {
     actual_speed[j] = 0;
   }
 
-  //the set up for recieving from the PI
+  // Sets up for recieving from the PI.
   pinMode(LED_BUILTIN, OUTPUT);
-  // Initialize I2C
+  // Initialize I2C.
   Wire.begin(MY_ADDR);
-  // Set callbacks for I2C interrupts
+  // Set callbacks for I2C interrupts.
   Wire.onReceive(receive);
   Wire.onRequest(request);
 
@@ -198,9 +202,7 @@ void setup() {
 // Runs the motors and collects data on the velocity of the motors.
 void loop() {  
   // These variables are used for the control system and are important
-  // for the feedback control loop in the system. Due to the nature of
-  // the motors, the Kp value here is the maximum Kp that allows the
-  // motors to run smoothly and not jitter the wheels excessively.
+  // for the feedback control loop in the system. 
   float Kp_vel = 2.5;
   float Kp_pos = 18.7;
   float Ki_pos = 2.5;
@@ -212,7 +214,7 @@ void loop() {
   // Updates last time program ran.
   last_time_ms = millis();
 
-  // If there is data on the buffer from the PI, read it
+  // If there is data on the buffer from the PI, read it.
   if (msgLength > 0) {
     if (offset == 1) {
       digitalWrite(LED_BUILTIN,instruction[0]);
@@ -223,6 +225,7 @@ void loop() {
 
   // Calculates the current time of the program.
   current_time = (float)(last_time_ms - start_time_ms)/1000;
+  
   // Initiates desired position as step response for pi rad.
   // Experiment was done on motor 1.
   if (current_time >= 1) {
@@ -240,7 +243,7 @@ void loop() {
     prev_pos[i] = actual_pos[i];
   }
 
-  // Controller loop
+  // Controller for aiming towards the desired position on both motors.
   for (int j = 0; j < 2; j++) {
     pos_error[j] = desired_pos[j] - actual_pos[j];
     integral_error[j] = integral_error[j] + pos_error[j]*((float)desired_Ts_ms / 1000);
@@ -253,14 +256,11 @@ void loop() {
       error[j] = sgn(error[j]) * min(maxVelocity / Kp_pos, abs(error[j]));
       integral_error[j] = (desired_speed[j] - Kp_pos*error[j]) / Ki_pos;
     }
-    
-
     Voltage[j] = Kp_vel * error[j];
   }
 
   // Sets speed and direction on motors.
   for (int k = 0; k < 2; k++) {
-    // Corrects direction
     if (Voltage[k] > 0) {
       // Rotates the motors counter-clockwise.
       digitalWrite(VoltageSign[k], HIGH);   // For motor 1
@@ -281,7 +281,7 @@ void loop() {
   analogWrite(MotorVoltage[0], PWM[0]);
   analogWrite(MotorVoltage[1], PWM[1]);
 
-  // Outputs results of one motor for 3 seconds.
+  // Outputs results of one motor for 6 seconds.
   // Ensure that the voltage and actual speed
   // variables correspond to the correct motor.
   if (current_time <= 6) {
@@ -292,7 +292,7 @@ void loop() {
     Serial.print(actual_pos[0]);
     Serial.println("");
   }
-  // Stops printing data after 3 seconds.
+  // Stops printing data after 6 seconds.
   else if (stop == false) {
     Serial.println("Finished");
     stop = true;
@@ -305,12 +305,11 @@ void loop() {
 }
 
 // ================
-// MYENC FUNCTION
+// FUNCTIONS
 // ================
+
 // Adjusts the count on the channels to be more precise for both
-// motors 1 and 2. This function is called to help calculate the
-// current position on motors 1 and 2 and determine the velocity
-// of the motors for the feedback control loop and data display.
+// motors 1 and 2. 
 long myEnc(int motor) {
   // Activates to adjust the count on the motor 1 encoder.
   if (motor == 1) {
@@ -333,7 +332,7 @@ long myEnc(int motor) {
   }
 }
 
-// printReceived helps us see what data we are getting from the leader
+// Sets what data will be received by Pi for data communication.
 void printReceived() {
   for (int i = 0; i < msgLength; i++) {
     stringInput[i] = instruction[i];
@@ -341,7 +340,7 @@ void printReceived() {
   }
 }
 
-// function called when an I2C interrupt event happens
+// Sends back quadrant if Pi needs to receive data from Arduino.
 void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
@@ -353,6 +352,7 @@ void receive() {
   }
 }
 
+// Requests data to fix timing.
 void request() {
   // According to the Wire source code, we must call write() within the requesting ISR
   // and nowhere else. Otherwise, the timing does not work out. See line 238:
@@ -361,19 +361,18 @@ void request() {
   reply = 0;
  }
 
- // Returns a sign of the value.
- int sgn(float value) {
-  if (value > 0) {
-    return 1;
-  }
-  else if (value < 0) {
-    return -1;
-  }
-  else {
-    return 0;
-  }
- }
-
+// Returns a sign of the value.
+int sgn(float value) {
+if (value > 0) {
+  return 1;
+}
+else if (value < 0) {
+  return -1;
+}
+else {
+  return 0;
+}
+}
 // ================
 // CODE ENDS HERE
 // ================
