@@ -1,4 +1,4 @@
-// Mini Project Controller V3
+// Mini Project Controller V3 Final Implementation Without Computer Vision
 // ================
 // Author: Madeleine Houghton
 // Date: 2/19/2024
