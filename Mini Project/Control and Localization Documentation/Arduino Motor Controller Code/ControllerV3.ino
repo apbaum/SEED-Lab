@@ -268,11 +268,11 @@ void loop() {
   for (int k = 0; k < 2; k++) {
     if (Voltage[k] > 0) {
       // Rotates the motors counter-clockwise.
-      digitalWrite(VoltageSign[k], HIGH);   // For motor 1
+      digitalWrite(VoltageSign[k], HIGH);  
     }
     else {
       // Rotates the motors clockwise.
-      digitalWrite(VoltageSign[k], LOW);    // For motor 1
+      digitalWrite(VoltageSign[k], LOW);    
     }
 
     // Saturates the voltage to be within the batter voltage range.
