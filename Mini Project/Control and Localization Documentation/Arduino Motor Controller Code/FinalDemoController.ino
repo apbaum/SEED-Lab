@@ -1,6 +1,6 @@
 // Mini Project Finalized Controller (Computer Vision Version)
 // ================
-// Author: Madeleine Houghton
+// Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 2/21/2024
 // ================
 // The purpose of this code is to design a PI controller
