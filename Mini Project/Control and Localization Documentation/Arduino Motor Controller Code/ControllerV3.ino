@@ -1,6 +1,6 @@
 // Mini Project Controller V3 Final Implementation Without Computer Vision
 // ================
-// Author: Madeleine Houghton
+// Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 2/19/2024
 // ================
 // The purpose of this code is to design a PI controller
