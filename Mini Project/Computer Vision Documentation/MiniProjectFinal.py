@@ -4,7 +4,8 @@
 # The purpose of this code is to use a webcam to read
 # the location of a marker within a set of four quadrants.
 # Once the quadrant of the marker's location is determined,
-# it communicates the quadrant location to the Arduino.
+# it communicates the quadrant location to the Arduino. The
+# quadrant is also displayed on an LCD screen.
 
 # Using pictures to determine which quadrant marker is in
 import cv2
