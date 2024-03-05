@@ -1,1 +1,1 @@
-This folder contains the code developed for the computer vision tasks in Demo 1 to accomplish the webcam and angle detection task in the project.
+This folder contains the code developed for the computer vision tasks in Demo 1. The computer vision tasks in Demo 1 include having a web camera detect the angle at which an Aruco marker is detected and placed within the camera's view.
