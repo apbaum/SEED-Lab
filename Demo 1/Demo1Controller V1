@@ -1,4 +1,10 @@
-// header here lol
+// Demo 1 Robot Localization and Control V1
+// Author: Quinn Hejmanowski
+
+// The purpose of this code is to provide a
+// draft of the robot controller for localization
+// and control. The code sets the desired voltage
+// levels of the motors to move and turn the robot.
 
 #define NUM_MOTOR_PINS 5
 int MotorPinArray[NUM_MOTOR_PINS] = {4, 7, 8, 9, 10};
