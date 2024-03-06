@@ -30,7 +30,7 @@ double prevRobotDistance = 0;
 double robotSpeed = 0;
 
 double desiredDistance = 0;
-double desiredRobotAngle = 4;
+double desiredRobotAngle = 0;
 
 double distanceError = 0;
 double angleError = 0;
@@ -42,9 +42,9 @@ float distanceKp = 1;
 double currentdl[2] = {0,0};
 double lastdl[2] = {0,0};
 
-double width = 1.5;
+double width = 11.375/12;
 
-double encClicksToFeet = 4; //currently converting to inches instead of feet in the name of the animation looking precise. This number will likely need to be recalibrated
+double encClicksToFeet = 40; //This number will likely need to be recalibrated
 
 float Voltage[2] = {0,0};
 float avgVolt = 0;
@@ -151,8 +151,8 @@ void loop() {
   difVolt = angleKp * angleError;
   avgVolt = distanceKp * distanceError;
 
-  Voltage[0] = avgVolt - difVolt/2;
-  Voltage[1] = avgVolt + difVolt/2;
+  Voltage[0] = avgVolt + difVolt/2;
+  Voltage[1] = avgVolt - difVolt/2;
 
   for (int k = 0; k < 2; k++) {
     if (Voltage[k] > 0) {
