@@ -1,4 +1,4 @@
-// Demo 1 Robot Localization and Control V2
+// Demo 1 Robot Localization and Control V
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 3/4/2024
