@@ -1,7 +1,7 @@
 // Demo 1 Robot Localization and Control V4
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
-// Date: 3/8/2024
+// Date: 3/4/2024
 // ================
 // The purpose of this code is to design a controller
 // to move a robot to a desired distance and angle.
@@ -74,8 +74,8 @@ float desiredDistVel = 0;
 // These variables are the user input of the target distance
 // and velocity of the robot. These variables should not change
 // or be altered during program execution.
-const float TARGET_DISTANCE = 3;
-const float TARGET_ANGLE_DEG = 0;
+const float TARGET_DISTANCE = 0;
+const float TARGET_ANGLE_DEG = 360;
 
 // These parameters are used for the desired distance and angle.
 // The variables change since the input is simulated as a ramp
@@ -128,8 +128,8 @@ float currentdl[2] = {0,0};
 float lastdl[2] = {0,0};
 
 // Width of the robot and radius of the wheel. Both are in feet.
-float width = 0.9479;
-float radius = 0.26365;
+float width = 1;
+float radius = 0.268;
 
 // Converts encoder counts to feet.
 double encClicksToFeet = 2*PI*radius/3200;
@@ -226,7 +226,7 @@ void loop() {
 
   // These variables are the gains for the distance controller.
   float Kp_distance = 18.5;
-  float Ki_distance = 4;
+  float Ki_distance = 6;
   float distanceVelKp = 4;
   float maxDistVel = 2.4;
 
@@ -234,10 +234,10 @@ void loop() {
 
   // Sets the input for how much time to spend on ramp rise.
   float riseTimeAngle = 2.5;
-  float riseTimeDist = 5;
+  float riseTimeDist = 8;
 
   // Corrects angle rise time if the angle is more than 180 degrees.
-  if (abs(TARGET_ANGLE_DEG) > 180) {
+  if (abs(TARGET_ANGLE_DEG) >= 180) {
     riseTimeAngle = 7;
   }
 
@@ -365,7 +365,7 @@ void loop() {
   }
 
   // Calculates instantaneous forward velocity and rotational velocity.
-  instantRho = 0.25*(actual_speed[1] + actual_speed[0])/2;
+  instantRho = radius*(actual_speed[1] + actual_speed[0])/2;
   instantPhi = radius*(actual_speed[1] - actual_speed[0])/width; 
 
   // Samples every desired sample rate.
