@@ -4,7 +4,7 @@
 
 // GLOBAL VARIABLES
 // Width of the robot and radius of the wheel. Both are in feet.
-float width = 1;
+float width = 0.9479;
 float radius = 0.268;
 
 // Converts encoder counts to feet.
