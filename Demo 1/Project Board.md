@@ -12,7 +12,7 @@
   <tr>
     <td class="tg-0lax">Quinn Hejmanowski</td>
     <td class="tg-0lax">Localization and Control</td>
-    <td class="tg-0lax">• Design and modify robot<br>• Debug any software and hardware issues on the robot<br>• Implement solutions to hardware limitations for the robot in experimental testing<br>• Assist in I2C communication<br><br>• Assist in Arduino to Raspberry Pi communication</td>
+    <td class="tg-0lax">• Design and modify robot<br>• Debug any software and hardware issues on the robot<br>• Implement solutions to hardware limitations for the robot in experimental testing<br>• Assist in I2C communication<br>• Assist in Arduino to Raspberry Pi communication</td>
   </tr>
   <tr>
     <td class="tg-0lax">Madeleine Houghton</td>
