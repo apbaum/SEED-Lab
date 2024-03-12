@@ -1,4 +1,5 @@
 ## Project Board
+# Group 5: Electrical Elite
 <table class="tg">
 <thead>
   <tr>
