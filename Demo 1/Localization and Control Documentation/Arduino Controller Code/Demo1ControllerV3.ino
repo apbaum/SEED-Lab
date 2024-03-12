@@ -1,4 +1,4 @@
-// Demo 1 Robot Localization and Control V
+// Demo 1 Robot Localization and Control V3
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 3/4/2024
@@ -294,20 +294,11 @@ void loop() {
   integralDistError = integralDistError + distanceError*((float)desired_Ts_ms / 1000);
   desiredDistVel = Kp_distance * distanceError + Ki_distance * integralDistError;
 
+  // Anti-windup for the forward velocity to saturate the wheel speed.
   if (abs(desiredDistVel) >= maxDistVel) {
     desiredDistVel = sgn(desiredDistVel) * maxDistVel;
   }
   distanceVelError = desiredDistVel - instantRho;
-
-
-  // Anti-windup for the distance velocity to be fixed within a specific range.
-  // This is added since the gains determined used the Simulink file that included
-  // clamping on the distance controller.
-  /*if (abs(desiredDistVel) >= maxDistVel) {
-    desiredDistVel = sgn(desiredDistVel) * maxDistVel;
-    distanceVelError = sgn(distanceVelError) * min(maxDistVel / Kp_distance, abs(distanceVelError));
-    integralDistError = (desiredDistVel - Kp_distance*distanceVelError) / Ki_distance;
-  }*/
 
   // Calculates the average and difference voltages.
   difVolt = angleVelKp * angleVelError;
