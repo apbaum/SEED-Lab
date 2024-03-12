@@ -187,23 +187,28 @@ void countEncoder2() {
 // Initializes pins, ISRs, and gives variables starting values before
 // running the motors and collecting data.
 void setup() {
-  //corrections
-  if(TARGET_DISTANCE != 0){
-    if(TARGET_DISTANCE < 4){
-      TARGET_DISTANCE = (TARGET_DISTANCE+.75)*.84615;
-    } else if (TARGET_DISTANCE > 8){
-      TARGET_DISTANCE = (TARGET_DISTANCE+.75)*.84615-0.12;
-    } else {
-      TARGET_DISTANCE = (TARGET_DISTANCE+.75)*.84615*1.125-0.55;
+  // Corrects the target distance to accommodate for slipping.
+  if (TARGET_DISTANCE != 0) {
+    // Corrects for distances less than 4 ft.
+    if (TARGET_DISTANCE < 4) {
+      TARGET_DISTANCE = (TARGET_DISTANCE + 0.75) * 0.84615;
+    } 
+    // Corrects for distances larger than 8 ft.
+    else if (TARGET_DISTANCE > 8){
+      TARGET_DISTANCE = (TARGET_DISTANCE + 0.75) * 0.84615 - 0.12;
+    }
+    // Corrects for distances in between 4 ft and 8 ft.
+    else {
+      TARGET_DISTANCE = (TARGET_DISTANCE + 0.75) * 0.84615 * 1.125 - 0.55;
     }
   }
 
+  // Corrects the target angle to accommodate for slipping.
   if (abs(TARGET_ANGLE_DEG) > 180) {
-    TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8)*.90909+13;
+    TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8)* 0.90909 + 13;
   } else if (TARGET_ANGLE_DEG != 0){
-    TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8)*.90909;
+    TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8) * 0.90909;
   }
-  
 
   // Initializes motor pins on the motor drive shield.
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
@@ -257,15 +262,9 @@ void loop() {
   float riseTimeDist = 6;
 
   // Corrects angle rise time if the angle is more than 180 degrees.
-
   if (abs(TARGET_ANGLE_DEG) >= 180) {
     riseTimeAngle = 6;
   }
-
-  // Corrects distance rise time if the distance is more than 5 feet.
-  /*if (abs(TARGET_DISTANCE > 5)) {
-    riseTimeDist = 7;
-  }*/
 
   // Variables to calculate the ramp function input rises.
   float distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
@@ -345,15 +344,17 @@ void loop() {
   avgVolt = distanceVelKp * distanceVelError;
 
   // Starts moving robot forward when the angle is set.
+  // Sets a counter to ensure system is stable.
   if (abs(TARGET_ANGLE_DEG*PI/180 - robotAngle) < 0.01) {
     counter = counter + 1;
-  } else {
+  } 
+  else {
     counter = 0;
   }
-  
+
+  // If the counter is hit, will start moving the robot forward.
   if (counter > 50){
     startMove = true;
-
   }
 
   // Sets the voltage on the motors based on the average and difference voltages.
