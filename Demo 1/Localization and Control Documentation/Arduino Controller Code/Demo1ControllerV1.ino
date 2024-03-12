@@ -50,11 +50,11 @@ float Voltage[2] = {0,0};
 float avgVolt = 0;
 float difVolt = 0;
 
-  // the interupt for the left encoder
+// The interupt for the left encoder
 void LARise(){
   if(millis() > LInteruptTriggered + sampletime){
     LInteruptTriggered = millis();
- // implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
+ // Implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
     if (digitalRead(Motor1Chan[0]) == digitalRead(Motor1Chan[1])){
       Lcount = Lcount + 2;
     } else {
@@ -63,7 +63,7 @@ void LARise(){
   }
 }
 
-  // the function for reading the left encoder
+// The function for reading the left encoder
 long LEncoder(){
   if (digitalRead(Motor1Chan[0]) != digitalRead(Motor1Chan[1])){
     return (Lcount + 1);
@@ -72,11 +72,11 @@ long LEncoder(){
   }
 }
 
-  // the interupt for the right encoder
+// The interupt for the right encoder
 void RARise(){
   if(millis() > RInteruptTriggered + sampletime){
     RInteruptTriggered = millis();
- // implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
+ // Implements the logic to interpret the encoder. If A toggled so that A and B are equal, it's rotated twice clockwise. Otherwise, A toggled and it rotated twice counterclockwise
     if (digitalRead(Motor2Chan[0]) == digitalRead(Motor2Chan[1])){
       Rcount = Rcount + 2;
     } else {
@@ -85,7 +85,7 @@ void RARise(){
   }
 }
 
-  // the function for reading the right encoder
+// The function for reading the right encoder
 long REncoder(){
   if (digitalRead(Motor2Chan[0]) != digitalRead(Motor2Chan[1])){
     return (Rcount + 1);
@@ -121,7 +121,7 @@ void setup() {
 
 void loop() {
   lastTime = millis();
-   // convert encoder clicks to feet
+   // Convert encoder clicks to feet
   currentdl[0] = LEncoder()/encClicksToFeet;
   currentdl[1] = REncoder()/encClicksToFeet; 
 
@@ -133,11 +133,11 @@ void loop() {
   float Voltage[2] = {0, 0};
   unsigned int PWM[2] = {0, 0};
 
-  // calculate the change in position and angle based on the encoder, and add to it previous values
+  // Calculate the change in position and angle based on the encoder, and add to it previous values
   robotDistance = prevRobotDistance + (currentdl[0]-lastdl[0]+currentdl[1]-lastdl[1])/2;
   robotAngle = prevRobotAngle + (currentdl[0]-lastdl[0]-currentdl[1]+lastdl[1])/width;
 
-  // current values become previous values for next loop
+  // Current values become previous values for next loop
   lastdl[0] = currentdl[0];
   lastdl[1] = currentdl[1];
   prevRobotDistance = robotDistance;
@@ -145,7 +145,7 @@ void loop() {
 
   Serial.println(Rcount);
 
-  // the math
+  // Determine the voltage to apply to the motors
   distanceError = desiredDistance - robotDistance;
   angleError = desiredRobotAngle - robotAngle;
   difVolt = angleKp * angleError;
