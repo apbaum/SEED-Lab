@@ -1,13 +1,14 @@
-// Demo 1 Robot Localization and Control V4
+// Demo 1 Robot Localization and Control Final Version
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
-// Date: 3/4/2024
+// Date: 3/10/2024
 // ================
 // The purpose of this code is to design a controller
 // to move a robot to a desired distance and angle.
 // The code uses a given distance and given angle
 // (altered directly in the program) to accurately 
-// maneuver the robot.
+// maneuver the robot. The code is the final 
+// rendition of the controller.
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot
