@@ -1,4 +1,4 @@
-// Demo 1 Robot Localization and Control V5
+// Demo 1 Robot Localization and Control V3
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 3/8/2024
@@ -246,18 +246,6 @@ void loop() {
   // Sets the input for how much time to spend on ramp rise.
   float riseTimeAngle = 2.5;
   float riseTimeDist = 6;
-
-  // Corrects angle rise time if the angle is more than 180 degrees.
-  /*
-  if (abs(TARGET_ANGLE_DEG) >= 180) {
-    riseTimeAngle = 7;
-  }
-  */
-
-  // Corrects distance rise time if the distance is more than 5 feet.
-  /*if (abs(TARGET_DISTANCE > 5)) {
-    riseTimeDist = 7;
-  }*/
 
   // Variables to calculate the ramp function input rises.
   float distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
