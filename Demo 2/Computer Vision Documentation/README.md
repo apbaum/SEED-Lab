@@ -1,1 +1,1 @@
-# Computer Vision Documentation
+# Computer Vision
