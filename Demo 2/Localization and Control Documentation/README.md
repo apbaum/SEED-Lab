@@ -1,1 +1,1 @@
-# Localization and Control Documentation
+# Localization and Control
