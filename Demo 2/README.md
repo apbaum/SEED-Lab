@@ -1,5 +1,5 @@
 # Demo 2 README
-This folder contains the Python and Arduino code developed to complete the tasks in Demo 2. For Demo 2, the first task the robot needs to complete includes having the robot locate a beacon and move and stop within 1 ft of the beacon (once detected). The second task has the robot move within 1 ft of the beacon and complete a loop around the beacon, moving no more than 2 ft away from the beacon at any time during the circle.
+This folder contains the Python and Arduino code developed to complete the tasks in Demo 2. Python code, used for the Raspberry Pi, is in the Computer Vision folder and Arduino code, for the Arduino, is in the Localization and Control folder. For Demo 2, the first task the robot needs to complete includes having the robot locate a beacon and move and stop within 1 ft of the beacon (once detected). The second task has the robot move within 1 ft of the beacon and complete a loop around the beacon, moving no more than 2 ft away from the beacon at any time during the circle.
 
 Edit project board
 # Project Board
@@ -16,12 +16,12 @@ Edit project board
   <tr>
     <td class="tg-0lax">Quinn Hejmanowski</td>
     <td class="tg-0lax">Localization and Control</td>
-    <td class="tg-0lax">• Design and modify robot<br>• Debug any software and hardware issues on the robot<br>• Implement solutions to hardware limitations for the robot in experimental testing<br>• Assist in I2C communication<br>• Assist in Arduino to Raspberry Pi communication</td>
+    <td class="tg-0lax">• Redesign and modify the robot (change back wheel) <br>• Debug any software and hardware issues on the robot<br>• Implement solutions to hardware limitations for the robot in experimental testing<br>• Assist in I2C communication<br>• Assist in Arduino to Raspberry Pi communication</td>
   </tr>
   <tr>
     <td class="tg-0lax">Madeleine Houghton</td>
     <td class="tg-0lax">Localization and Control</td>
-    <td class="tg-0lax">• Write and test Arduino code for robot<br>• Simulate MATLAB models and determine PI controller layouts<br>• Debug any software and hardware issues on the robot<br>• Assist in I2C Communication<br>• Assist in Arduino to Raspberry Pi communication<br></td>
+    <td class="tg-0lax">• Draft Arduino code (robot controller) based on tasks<br>• Simulate MATLAB models and determine PI controller layouts<br>• Debug any software and hardware issues on the robot<br>• Assist in I2C Communication<br>• Assist in Arduino to Raspberry Pi communication<br></td>
   </tr>
   <tr>
     <td class="tg-0lax">Zoe Karnisky</td>
