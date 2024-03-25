@@ -1,7 +1,7 @@
 # Demo 2 README
 This folder contains the Python and Arduino code developed to complete the tasks in Demo 2. Python code, used for the Raspberry Pi, is in the Computer Vision folder and Arduino code, for the Arduino, is in the Localization and Control folder. For Demo 2, the first task the robot needs to complete includes having the robot locate a beacon and move and stop within 1 ft of the beacon (once detected). The second task has the robot move within 1 ft of the beacon and complete a loop around the beacon, moving no more than 2 ft away from the beacon at any time during the circle.
 
-Edit project board
+# Edit project board
 # Project Board
 ## Group 5: Electrical Elite
 <table class="tg">
