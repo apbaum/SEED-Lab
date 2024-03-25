@@ -1,6 +1,7 @@
 # Demo 1 README
 This folder contains the code and models used to accomplish the tasks outlined in the assignment for Demo 1 for control and localization. The control and localization tasks in Demo 1 include having the robot move in a straight line for a set distance and having a robot move a set distance and turn a set angle. The computer vision tasks in Demo 1 include having a web camera detect the angle an Aruco marker is placed within the camera's view and display it onto the LCD. This folder also contains a project board describing the assigned tasks of each group member.
 
+# EDIT THE BOARD
 # Project Board
 ## Group 5: Electrical Elite
 <table class="tg">
