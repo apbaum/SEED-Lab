@@ -88,6 +88,7 @@ float TARGET_ANGLE_DEG = 30;
 
 // The variables are used to have the robot move in a circle.
 bool startCircle = false;
+float detectAngle = 0;
 
 // Global variables to be used for I2C communication.
 #include <Wire.h>
@@ -312,15 +313,6 @@ void loop() {
     detected = true;
   }
 
-  // Will reset the robot angle to calibrate the robot to respond to
-  // the angle received by the Raspberry Pi. This will only activate
-  // the moment the robot detects the marker.
-  if ((detected == true) && (oneTimeMove == true)) {
-    counts[0] = 0;
-    counts[1] = 0;
-    oneTimeMove = false;
-  }
-
   // Converts the encoder counts to feet.
   currentdl[0] = (double)myEnc(1) * encClicksToFeet;
   currentdl[1] = (double)myEnc(2) * encClicksToFeet;
@@ -335,6 +327,14 @@ void loop() {
   // Distance is in feet and angle is in radians.
   robotDistance = prevRobotDistance + (currentdl[0] - lastdl[0] + currentdl[1] - lastdl[1])/2;
   robotAngle = prevRobotAngle - (currentdl[0] - lastdl[0] - currentdl[1] + lastdl[1])/width;
+
+  // Gets the current position the moment the robot detects a marker.
+  // This position is used to get the received angle from the Raspberry Pi
+  // to correspond to the Arduino.
+  if ((detected == true) && (oneTimeMove == true)) {
+    detectAngle = robotAngle;
+    oneTimeMove = false;
+  }
   
   // Updates previous variables for distance and angle.
   prevRobotDistance = robotDistance;
@@ -382,6 +382,12 @@ void loop() {
     desiredAngle = 0;
     counter = 0;
     startMove = false;
+    
+    // Gets the current angle of the robot.
+    if ((oneTimeMove == false)) {
+      detectAngle = robotAngle;
+      oneTimeMove = true;
+    }
   }
 
   // Runs normal code if the robot does not initiate circle manuever.
@@ -413,7 +419,7 @@ void loop() {
   else {
     // First turns the robot 90 degrees clockwise to get it in position to do a circle.
     detected = false;
-    TARGET_ANGLE_DEG = -90;
+    TARGET_ANGLE_DEG = detectAngle - 90;
     TARGET_DISTANCE = 0;
     riseTimeAngle = 2.5;
     angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
@@ -564,6 +570,7 @@ void receive() {
     instruction[msgLength] = Wire.read();
     msgLength++;
     reply = TARGET_DISTANCE - 1;
+    reply2 = TARGET_ANGLE_DEG + detectAngle;
   }
 }
 
