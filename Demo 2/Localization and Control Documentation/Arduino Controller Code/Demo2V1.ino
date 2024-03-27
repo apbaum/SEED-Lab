@@ -302,7 +302,7 @@ void loop() {
       if (abs(TARGET_ANGLE_DEG) > 180) {
         TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8) * 0.90909 + 13;
       } 
-      // Corrects for angles less than or equal to 180 degrees.
+      // Corrects for angles not greater than 180 degrees.
       else if (TARGET_ANGLE_DEG != 0) {
         TARGET_ANGLE_DEG = (TARGET_ANGLE_DEG + 8) * 0.90909;
       }
