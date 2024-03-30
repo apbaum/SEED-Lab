@@ -87,6 +87,7 @@ float prev_pos[2] = {0, 0};
 // its current position.
 float currentAngle = 0;
 float currentPos = 0;
+float startPos = 0;
 
 // This holds calculated values for the controller to aim towards
 // a desired velocity for the angle and position.
@@ -319,6 +320,7 @@ void loop() {
       state = DETECTED_STATE;
       TARGET_ANGLE_DEG = currentAngle + robotAngle;
       TARGET_DISTANCE = currentPos;
+      startPos = currentPos;
       desiredAngle = 0;
       desiredDistance = 0;
     }
@@ -487,6 +489,11 @@ void loop() {
   // Distance is in feet and angle is in radians.
   robotDistance = prevRobotDistance + (currentdl[0] - lastdl[0] + currentdl[1] - lastdl[1])/2;
   robotAngle = prevRobotAngle - (currentdl[0] - lastdl[0] - currentdl[1] + lastdl[1])/width;
+
+  // Updates current robot distance from marker using camera. Only used when camera detects marker.
+  if (state = DETECTED_STATE) {
+    robotDistance = startPos - currentPos;
+  }
   
   // Updates previous variables for distance and angle.
   prevRobotDistance = robotDistance;
