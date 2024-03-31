@@ -359,6 +359,8 @@ void loop() {
     else {
       // Sets target angle and target distance.
       TARGET_ANGLE_DEG = robotAngle + currentAngle;
+      TARGET_DISTANCE = startPos;
+
       // Sets up ramp function rises for the distance and angle.
       riseTimeDist = 4;
       riseTimeAngle = 2.5;
@@ -387,7 +389,7 @@ void loop() {
 
     // If the camera reads that the robot is within 1 ft. Goes to
     // next state.
-    if (currentPos < 1) {
+    if (currentPos <= 1) {
       state = TURN_90_STATE;
       counter = 0;
       desiredAngle = 0;
