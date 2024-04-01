@@ -68,13 +68,14 @@ volatile uint8_t msgLength = 0;
 char stringInput[32] = {};
 volatile uint8_t reply = 0;
 bool detected = false;
+bool start = true;
 
 // Assigns timing variables for sampling the motor velocities.
 unsigned long desired_Ts_ms = 10;
 unsigned long last_time_ms;
 unsigned long start_time_ms;
 bool startMove = false;
-bool task2 = false;
+bool task2 = true;
 
 // These variables keep track of the actual speed on the motors.
 float actual_speed[2] = {0, 0};
@@ -275,13 +276,16 @@ void loop() {
   // IDLE STATE
   // In this state, it moves straight to the next state after resetting variables.
   if (state == IDLE_STATE) {
-    state = LOCATE_STATE;
-    startMove = false;
-    counter = 0;
-    TARGET_DISTANCE = 0;
-    TARGET_ANGLE_DEG = 0;
-    desiredAngle = 0;
-    desiredDistance = 0;
+    // Activates when task is ready.
+    if (start == true) {
+      state = LOCATE_STATE;
+      startMove = false;
+      counter = 0;
+      TARGET_DISTANCE = 0;
+      TARGET_ANGLE_DEG = 0;
+      desiredAngle = 0;
+      desiredDistance = 0;
+    }
   }
 
   // LOCATE STATE
@@ -362,7 +366,7 @@ void loop() {
       TARGET_DISTANCE = startPos;
 
       // Sets up ramp function rises for the distance and angle.
-      riseTimeDist = 4;
+      riseTimeDist = 10;
       riseTimeAngle = 2.5;
       distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
       angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
@@ -388,17 +392,37 @@ void loop() {
     }
 
     // If the camera reads that the robot is within 1 ft. Goes to
-    // next state.
-    if (currentPos <= 1) {
-      state = TURN_90_STATE;
+    // next state if task 2. Otherwise 
+    if (currentPos <= 0.8) {
+      // Goes to 90 degree turn if task 2.
+      if (task2 == true) {
+        state = TURN_90_STATE;
+
+        // Delays response so that the next state is not activated right away.
+        while (millis() < last_time_ms + (desired_Ts_ms*100)) {
+          // Waits until desired time passes.
+        }
+      }
+
+      // Otherwise goes back to idle state.
+      else {
+        start = false;
+        state = IDLE_STATE;
+      }
+
+      // Forces reset for next state to turn 90 deg.
       counter = 0;
       desiredAngle = 0;
       desiredDistance = 0;
       startMove = false;
-
-      // Forces reset for next state to turn 90 deg.
       counts[0] = 0;
       counts[1] = 0;
+      lastdl[0] = 0;
+      lastdl[1] = 0;
+      prevRobotDistance = 0;
+      prevRobotAngle = 0;
+      TARGET_DISTANCE = 0;
+      TARGET_ANGLE_DEG = 0;
     }
   }
 
@@ -423,7 +447,7 @@ void loop() {
 
     // Once the robot turns 90 degrees clockwise,
     // goes to the next state. 
-    if ((startMove == true) && (task2 = true)) {
+    if ((startMove == true) && (task2 == true)) {
       desiredAngle = 0;
       desiredDistance = 0;
       state = CIRCLE_STATE;
@@ -431,6 +455,10 @@ void loop() {
       // To perform circle correctly, reset location.
       counts[0] = 0;
       counts[1] = 0;
+      lastdl[0] = 0;
+      lastdl[1] = 0;
+      prevRobotDistance = 0;
+      prevRobotAngle = 0;
     }
   }
 
@@ -439,7 +467,7 @@ void loop() {
   else if (state == CIRCLE_STATE) {
     float turnRadius = 1;
     TARGET_DISTANCE = 2*PI*turnRadius;
-    TARGET_ANGLE_DEG = 360 + 35;
+    TARGET_ANGLE_DEG = 360 + 40;
 
     // Sets up ramp function rises for the distance and angle.
     riseTimeDist = 6;
