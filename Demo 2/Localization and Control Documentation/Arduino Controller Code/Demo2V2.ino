@@ -407,7 +407,7 @@ void loop() {
   // clockwise to prepare for circle.
   else if (state == TURN_90_STATE) {
     // Sets angle parameters.
-    TARGET_ANGLE_DEG = 90;
+    TARGET_ANGLE_DEG = -90;
     TARGET_DISTANCE = 0;
     riseTimeAngle = 1;
     angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
