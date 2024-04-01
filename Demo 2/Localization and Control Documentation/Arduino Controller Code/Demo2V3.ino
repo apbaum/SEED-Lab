@@ -362,7 +362,7 @@ void loop() {
     }
 
     // If the camera reads that the robot is within 1 ft. Goes to
-    // next state if task 2. Otherwise 
+    // next state if task 2. Otherwise ends current task.
     if (currentPos <= 0.8) {
       // Goes to 90 degree turn if task 2.
       if (task2 == true) {
