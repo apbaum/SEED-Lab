@@ -26,12 +26,12 @@ This folder contains the Python and Arduino code developed to complete the tasks
   <tr>
     <td class="tg-0lax">Zoe Karnisky</td>
     <td class="tg-0lax">Computer Vision</td>
-    <td class="tg-0lax">• Assist in web camera and Aruco marker detection<br>• Design and maintain Python code for Raspberry Pi<br>• Debug Rasberry Pi and Python code<br>• Assist in I2C Communication<br>• Assist in Arduino to Raspberry Pi communication</td>
+    <td class="tg-0lax">• Test and debug Python code for Aruco marker angle and position detection<br>• Test and debug Python code to send information from Raspberry Pi to Arduino<br>• Debug any software issues for the web camera and Raspberry Pi<br>• Assist in I2C Communication<br>• Assist in Arduino to Raspberry Pi communication</td>
   </tr>
   <tr>
     <td class="tg-0lax">Adam Nussbaum</td>
     <td class="tg-0lax">Computer Vision</td>
-    <td class="tg-0lax">• Design and assist in Aruco marker detection and web camera software<br>• Determine algorithm for angle and position detection<br>• Debug any software and hardware issues for the web camera and Raspberry Pi<br>• Perform hardware debugging for Raspberry Pi<br>• Assist in I2C communication<br><br>• Assist in Arduino to Raspberry Pi communication</td>
+    <td class="tg-0lax">• Design and implement Aruco marker detection and web camera software<br>• Determine algorithm for angle and position detection<br>• Debug any hardware issues for the web camera and Raspberry Pi<br>• Develop and test Python code for Arduino to Raspberry Pi communication<br>• Assist in I2C communication<br>• Assist in Arduino to Raspberry Pi communication</td>
   </tr>
 </tbody>
 </table><br>
