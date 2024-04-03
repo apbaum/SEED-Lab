@@ -7,7 +7,7 @@
 % The simulink model 'steeringsimulation' is run, and the results plotted
 
 
-% conversions from angle to counts and back
+% Conversions from angle to counts and back
 rad_to_counts = 3200/(2*pi);
 counts_to_rad = 1/rad_to_counts;
 r_measured_ft = 0.26365; % measured wheel radius;
@@ -16,21 +16,20 @@ r_actual_ft = .25; % actual wheel radius
 b_actual_ft = 1; % actual robot width
 Ts=.01; % sample time in seconds
 %
-% right wheel parameters
-%
+% Right wheel parameters
 K_r=1.2;
 sigma_r=10.7;
 
 %
-% left wheel parameters
-%
+% Left wheel parameters
 K_l=1.4;
 sigma_l=11.7;
 
+% Sets the target angle and distance
 phi_d=timeseries([0 0 0],[0 10 20]);
 rho_d=timeseries([0 7 7],[0 4 20]);
 
-
+% Plots the results of the simulation
 out=sim('steeringsimulation.slx')
 figure(1)
 clf
