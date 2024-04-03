@@ -63,7 +63,7 @@
 #include <Wire.h>
 #define MY_ADDR 8
 volatile uint8_t offset = 0;
-volatile uint8_t instruction[32] = {0};
+float instruction[32] = {0};
 volatile uint8_t msgLength = 0;
 char stringInput[32] = {};
 volatile uint8_t reply = 0;
@@ -225,6 +225,11 @@ void countEncoder2() {
 // running the motors and collecting data.
 void setup() {
   // Initializes motor pins on the motor drive shield.
+
+  Wire.begin(MY_ADDR);
+  Wire.onReceive(receive);
+  Wire.onRequest(request);
+
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
     pinMode(MotorPinArray[i], OUTPUT);
   }
@@ -322,6 +327,8 @@ void loop() {
       startPos = currentPos;
       desiredAngle = 0;
       desiredDistance = 0;
+      integralAngleError = 0;
+      integralDistError = 0;
     }
 
     // Otherwise, continues turning. If the first turn is met, has
@@ -392,6 +399,8 @@ void loop() {
       prevRobotAngle = 0;
       TARGET_DISTANCE = 0;
       TARGET_ANGLE_DEG = 0;
+      integralAngleError = 0;
+      integralDistError = 0;
     }
   }
 
@@ -499,6 +508,8 @@ void loop() {
   if (state == DETECTED_STATE) {
     distanceError = currentPos;
     angleError = currentAngle;
+    riseTimeAngle = 4;
+    integralAngleError = 0;
   }
 
   // Calculates the desired angular velocity.
@@ -615,7 +626,7 @@ void printReceived() {
     if (i%2 == 1){
       currentPos = instruction[i];
     } 
-    else {
+    else if (abs(instruction[i]) < 10){
       currentAngle = instruction[i];
     }
   }
