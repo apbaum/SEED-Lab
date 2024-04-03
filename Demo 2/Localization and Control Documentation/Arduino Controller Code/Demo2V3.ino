@@ -75,7 +75,7 @@ unsigned long desired_Ts_ms = 10;
 unsigned long last_time_ms;
 unsigned long start_time_ms;
 bool startMove = false;
-bool task2 = true;
+bool task2 = false;
 
 // These variables keep track of the actual speed on the motors.
 float actual_speed[2] = {0, 0};
@@ -225,8 +225,6 @@ void countEncoder2() {
 // running the motors and collecting data.
 void setup() {
   // Initializes motor pins on the motor drive shield.
-
-  pinMode(13, OUTPUT);
 
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
@@ -517,7 +515,6 @@ void loop() {
 
   // Updates current robot distance from marker using camera. Only used when camera detects marker.
   if (state == DETECTED_STATE) {
-    digitalWrite(13, LOW);
     distanceError = currentPos;
     angleError = -1 * currentAngle;
     riseTimeAngle = 4;
@@ -538,15 +535,6 @@ void loop() {
     desiredDistVel = sgn(desiredDistVel) * maxDistVel;
   }
   distanceVelError = desiredDistVel - instantRho;
-
-  // Ensures the rotational velocity is not above a large amount.
-  if (current_time < riseTimeAngle) {
-    desiredAngle = desiredAngle + angleRise;
-  }
-  // End of ramp function.
-  else {
-    desiredAngle = TARGET_ANGLE_DEG*PI/180;
-  }
 
   // Calculates the average and difference voltages.
   difVolt = angleVelKp * angleVelError;
