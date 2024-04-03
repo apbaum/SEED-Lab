@@ -15,12 +15,11 @@ b_measured_ft = 0.9479; % measured robot width;
 r_actual_ft = .25; % actual wheel radius
 b_actual_ft = 1; % actual robot width
 Ts=.01; % sample time in seconds
-%
+
 % Right wheel parameters
 K_r=1.2;
 sigma_r=10.7;
 
-%
 % Left wheel parameters
 K_l=1.4;
 sigma_l=11.7;
