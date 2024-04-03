@@ -1,4 +1,4 @@
-// Demo 2 Robot Localization and Control V3
+// Demo 2 Robot Localization and Control V2
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 3/30/2024
@@ -294,7 +294,7 @@ void loop() {
     // Sets turning amount until marker is detected.
     TARGET_ANGLE_DEG = 45 + 45*turn;
     TARGET_DISTANCE = robotDistance;
-    riseTimeAngle = 1;
+    riseTimeAngle = 1.5;
     angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
 
     // Simulates a ramp input for the desired angle. The robot will keep spinning
@@ -362,7 +362,7 @@ void loop() {
     }
 
     // If the camera reads that the robot is within 1 ft. Goes to
-    // next state if task 2. Otherwise ends current task.
+    // next state if task 2. Otherwise 
     if (currentPos <= 0.8) {
       // Goes to 90 degree turn if task 2.
       if (task2 == true) {
@@ -644,6 +644,16 @@ void request() {
     return 0;
   }
  }
+
+ void receive() {
+  // Set the offset, this will always be the first byte.
+  offset = Wire.read();
+  // If there is information after the offset, it is telling us more about the command.
+  while (Wire.available()) {
+    instruction[msgLength] = Wire.read();
+    msgLength++;
+  }
+}
 
 // ================
 // CODE ENDS HERE
