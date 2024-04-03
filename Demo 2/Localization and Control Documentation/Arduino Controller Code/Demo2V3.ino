@@ -226,6 +226,8 @@ void countEncoder2() {
 void setup() {
   // Initializes motor pins on the motor drive shield.
 
+  pinMode(13, OUTPUT);
+
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
   Wire.onRequest(request);
@@ -299,7 +301,7 @@ void loop() {
     // Sets turning amount until marker is detected.
     TARGET_ANGLE_DEG = 45 + 45*turn;
     TARGET_DISTANCE = robotDistance;
-    riseTimeAngle = 1.5;
+    riseTimeAngle = 2;
     angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
 
     // Simulates a ramp input for the desired angle. The robot will keep spinning
@@ -322,11 +324,15 @@ void loop() {
     if (detected == true) {
       counter = 0;
       state = DETECTED_STATE;
+
+      /*
       TARGET_ANGLE_DEG = currentAngle + robotAngle;
       TARGET_DISTANCE = currentPos;
       startPos = currentPos;
       desiredAngle = 0;
       desiredDistance = 0;
+      */
+
       integralAngleError = 0;
       integralDistError = 0;
     }
@@ -347,6 +353,8 @@ void loop() {
   // web camera (angle and distance) to move to the target
   else if (state == DETECTED_STATE) {
     // If there is data on the buffer from the PI, read it.
+
+    int undetectCounter = 0;
     if (msgLength > 0) {
       if (offset == 1) {
         digitalWrite(LED_BUILTIN,instruction[0]);
@@ -359,7 +367,10 @@ void loop() {
     } 
     else {
       // Resets the communication if webcamera no longer reads anything.
-      detected = false;
+      undetectCounter++;
+      if (undetectCounter > 10){
+        detected = false;
+      }
     }
 
     // If the camera no longer detects anything, goes back to previous state.
@@ -506,8 +517,9 @@ void loop() {
 
   // Updates current robot distance from marker using camera. Only used when camera detects marker.
   if (state == DETECTED_STATE) {
+    digitalWrite(13, LOW);
     distanceError = currentPos;
-    angleError = currentAngle;
+    angleError = -1 * currentAngle;
     riseTimeAngle = 4;
     integralAngleError = 0;
   }
