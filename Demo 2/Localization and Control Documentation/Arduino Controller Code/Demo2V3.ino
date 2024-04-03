@@ -539,6 +539,15 @@ void loop() {
   }
   distanceVelError = desiredDistVel - instantRho;
 
+  // Ensures the rotational velocity is not above a large amount.
+  if (current_time < riseTimeAngle) {
+    desiredAngle = desiredAngle + angleRise;
+  }
+  // End of ramp function.
+  else {
+    desiredAngle = TARGET_ANGLE_DEG*PI/180;
+  }
+
   // Calculates the average and difference voltages.
   difVolt = angleVelKp * angleVelError;
   avgVolt = distanceVelKp * distanceVelError;
