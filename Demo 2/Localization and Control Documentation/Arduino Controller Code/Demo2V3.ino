@@ -366,7 +366,7 @@ void loop() {
     else {
       // Resets the communication if webcamera no longer reads anything.
       undetectCounter++;
-      if (undetectCounter > 10){
+      if (undetectCounter > 50){
         detected = false;
       }
     }
@@ -639,8 +639,6 @@ void printReceived() {
       currentAngle = instruction[i];
     }
   }
-  Serial.println(currentPos);
-  Serial.println(currentAngle);
 }
 
 // Requests data to fix timing.
