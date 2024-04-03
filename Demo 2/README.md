@@ -34,4 +34,3 @@ This folder contains the Python and Arduino code developed to complete the tasks
   </tr>
 </tbody>
 </table><br>
-
