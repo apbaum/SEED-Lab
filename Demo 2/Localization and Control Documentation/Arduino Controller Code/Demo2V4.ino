@@ -343,31 +343,29 @@ void loop() {
   // Once the web camera detects a marker, it will use the data read from the
   // web camera (angle and distance) to move to the target
   else if (state == DETECTED_STATE) {
-    // If the camera no longer detects anything, goes back to previous state.
+    // Sets desired angle to current angle.
     if (!(abs(robotAngle - desiredAngle) < 0.5)) {
       desiredAngle = robotAngle;
     }
     else {
-      // Sets target angle and target distance.
+      // Sets target target distance.
       TARGET_DISTANCE = 7;
 
-      // Sets up ramp function rises for the distance and angle.
+      // Sets up ramp function rises for the distance.
       riseTimeDist = 10;
       distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
 
       // Simulates a ramp input for the desired distance. Only
       // activates when angle is set.
-      //if (startMove == true) {
         if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
           desiredDistance = TARGET_DISTANCE;
         }
         else {
           desiredDistance = desiredDistance + distanceRise;
         }
-      //}
     }
     // If the camera reads that the robot is within 1 ft. Goes to
-    // next state if task 2. Otherwise 
+    // next state if task 2. 
     if (abs(TARGET_DISTANCE - robotDistance) <= 1) {
       // Goes to 90 degree turn if task 2.
       if (task2 == true) {
