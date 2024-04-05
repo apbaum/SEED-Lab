@@ -1,3 +1,64 @@
+// Demo 2 Robot Localization and Control Final Implementation
+// ================
+// Authors: Madeleine Houghton and Quinn Hejmanowski
+// Date: 4/4/2024
+// ================
+// The purpose of this code is to design a controller
+// to move a robot based on data collected by a web 
+// camera (from a Raspberry Pi) that is detecting an
+// Aruco marker. If no data is collected, the robot will
+// rotate a set angle at defined intervals. When data
+// is read by the web camera, the robot will move to that angle
+// and, based on the camera data, move to within 1 ft of
+// the marker. If doing task 2, another piece of code
+// in the program will run to have the robot move in a circle.
+
+// DISCLAIMER:
+// This program assumes that the assembly of a robot structure,
+// Raspberry Pi, and wiring for the motors to the Arduino and
+// motor driver shield have been completed. Refer to Resources
+// for additional info on the motor and motor driver shield
+// wiring configurations. The hardware configuration mentioned
+// here are the minimum requirements to use the program
+// as intended. 
+
+// Hardware Required
+// ----------------
+//    x1 Arduino Uno Board
+//    x1 Motor Driver Shield (compatible with Arduino)
+//    x2 Motors with mounted wheels
+//    x1 Mounted wheel (no motor) for turning
+//    x1 Voltage Regulator
+//    x1 Raspberry Pi
+//    x1 Battery Pack (~7.8 V) with fuse connector
+
+// Hardware Configurations
+// ----------------
+//    Ensure the battery pack is connected to the corresponding
+//    - and + terminals on the input to the voltage regulator.
+//    Ensure that the output terminals of the voltage regulator
+//    correspond to the correct - and + terminals on the motor
+//    power inputs of the motor driver shield.
+//    Install the motor driver shield onto the Arduino.
+//    Make the necessary connections of the motor wires to the
+//    motor driver shield (refer to driver shield website).
+//    Make the necessary connections between the Raspberry Pi
+//    and Arduino.
+
+// How to Use Code
+// ----------------
+//    Download and open code in Arduino sketch in Arduino IDE.
+//    Upload the code from the IDE to the Arduino board.
+
+// Resources
+// ----------------
+//  Motor Wire Connections: https://www.pololu.com/docs/0J55
+//  Motor Driver Shield: https://www.pololu.com/product/2824
+
+// ================
+// CODE BEGINS HERE
+// ================
+
 // Global variables to be used for I2C communication.
 #include <Wire.h>
 #define MY_ADDR 8
@@ -607,6 +668,7 @@ void request() {
   }
  }
 
+// Receives data from Raspberry Pi
  void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
