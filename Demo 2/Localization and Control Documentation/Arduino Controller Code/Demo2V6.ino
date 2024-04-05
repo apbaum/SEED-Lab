@@ -383,7 +383,7 @@ void loop() {
 
     // Once the robot turns 90 degrees clockwise,
     // goes to the next state. 
-    if ((abs(desiredAngle - (TARGET_ANGLE_DEG*PI/180)) < 0.5) && (task2 == true)) {
+    if ((startMove == true) && (task2 == true)) {
       desiredAngle = 0;
       desiredDistance = 0;
       state = CIRCLE_STATE;
@@ -496,7 +496,19 @@ void loop() {
   difVolt = angleVelKp * angleVelError;
   avgVolt = distanceVelKp * distanceVelError;
 
+  // Starts moving robot forward when the angle is set.
+  // Sets a counter to ensure system is stable.
+  if (abs(TARGET_ANGLE_DEG*PI/180 - robotAngle) < 0.01) {
+    counter = counter + 1;
+  } 
+  else {
+    counter = 0;
+  }
 
+  // If the counter is hit, will start moving the robot forward.
+  if (counter > 20){
+    startMove = true;
+  }
 // Sets the voltage on the motors based on the average and difference voltages.
   // Inverted because motor 1 is on the left and motor 2 is on the right.
   Voltage[0] = (avgVolt - difVolt)/2;   // Motor 1
