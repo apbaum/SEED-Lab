@@ -14,7 +14,7 @@ unsigned long desired_Ts_ms = 10;
 unsigned long last_time_ms;
 unsigned long start_time_ms;
 bool startMove = false;
-bool task2 = true;
+bool task2 = false;
 
 // These variables keep track of the actual speed on the motors.
 float actual_speed[2] = {0, 0};
