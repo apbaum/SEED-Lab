@@ -1,4 +1,4 @@
-// Demo 2 Robot Localization and Control Final Implementation
+// Demo 2 Robot Localization and Control Final Version
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 4/4/2024
@@ -224,12 +224,12 @@ void countEncoder2() {
 }
 
 void setup() {
-  // Initializes motor pins on the motor drive shield.
-
+  // Initializes I2C communication.
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
   Wire.onRequest(request);
-
+  
+  // Initializes motor pins on the motor drive shield.
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
     pinMode(MotorPinArray[i], OUTPUT);
   }
@@ -321,11 +321,8 @@ void loop() {
     if (detected == true) {
       counter = 0;
       detectCount = 0;
-
       state = LINE_UP_STATE;
-
       startMove = false;
-
       robotDistance = 0;
       prevRobotDistance = 0;
       robotAngle = 0;
@@ -346,12 +343,18 @@ void loop() {
       }
     }
   } 
-  
+
+  // LINE UP STATE
+  // Makes sure the robot is lined up correctly after correcting for angle read by web camera.
   else if (state == LINE_UP_STATE) {
+    // Delays the robot to stabilize the camera.
     if (detectCount < 100){
         detectCount++;
     } 
+
+    // Reads data about the angle and corrects to the angle.
     else {
+      // Reads angle from web camera once.
       if (detectCount == 101) {
         if (msgLength > 0) {
           if (offset == 1) {
@@ -366,7 +369,8 @@ void loop() {
         desiredAngle = currentAngle; 
       }
 
-      if (abs(robotAngle-desiredAngle) < .5){
+      // If the angle is within a good range, go to the next state.
+      if (abs(robotAngle-desiredAngle) < 0.5){
         state = MOVE_STATE;
         robotAngle = 0;
         desiredAngle = 0;
@@ -374,6 +378,8 @@ void loop() {
     }
   }
 
+  // MOVE STATE
+  // Moves the robot a set distance towards a marker.
   else if (state == MOVE_STATE) {
     // Sets target target distance.
       TARGET_DISTANCE = 7;
@@ -384,16 +390,16 @@ void loop() {
 
       // Simulates a ramp input for the desired distance. Only
       // activates when angle is set.
-        if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
-          desiredDistance = TARGET_DISTANCE;
-        }
-        else {
-          desiredDistance = desiredDistance + distanceRise;
-        }
-          // If the camera reads that the robot is within 1 ft. Goes to
-      // next state if task 2. 
+      if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
+        desiredDistance = TARGET_DISTANCE;
+      }
+      else {
+        desiredDistance = desiredDistance + distanceRise;
+      }
+    
+    // If the camera reads that the robot is within 1 ft. Goes to
+    // next state if task 2. 
     if (abs(TARGET_DISTANCE - robotDistance) <= 1) {
-      
       // Resets the variables for current position and angle for the next state.
       counter = 0;
       desiredAngle = 0;
@@ -415,10 +421,10 @@ void loop() {
         state = TURN_90_STATE;
       }
 
-    // Otherwise goes back to idle state.
+      // Otherwise goes back to idle state.
       else {
-      start = false;
-      state = IDLE_STATE;
+        start = false;
+        state = IDLE_STATE;
       }
     }
   }
