@@ -1,7 +1,7 @@
-// Demo 2 Robot Localization and Control V2
+// Demo 2 Robot Localization and Control V1
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
-// Date: 3/30/2024
+// Date: 3/29/2024
 // ================
 // The purpose of this code is to design a controller
 // to move a robot based on data collected by a web 
@@ -139,6 +139,7 @@ int MotorVoltage[2] = {9,10};
 long counts[2] = {0, 0};
 int counter;
 int turn;
+int undetectCounter;
 
 // Defines the states and variables for a FSM. This model was
 // used to simplify how the code will run.
@@ -224,12 +225,12 @@ void countEncoder2() {
 // Initializes pins, ISRs, and gives variables starting values before
 // running the motors and collecting data.
 void setup() {
-  // Initializes motor pins on the motor drive shield.
-
+  // Initializes Raspberry Pi to Arduino communication.
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
   Wire.onRequest(request);
-
+  
+  // Initializes motor pins on the motor drive shield.
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
     pinMode(MotorPinArray[i], OUTPUT);
   }
@@ -275,7 +276,7 @@ void loop() {
   float distanceVelKp = 4;
   float maxDistVel = 3;
 
-  // Defines max battery voltage
+  // Defines max battery voltage.
   float Battery_Voltage = 7.8;
 
   // IDLE STATE
@@ -322,15 +323,6 @@ void loop() {
     if (detected == true) {
       counter = 0;
       state = DETECTED_STATE;
-
-      /*
-      TARGET_ANGLE_DEG = currentAngle + robotAngle;
-      TARGET_DISTANCE = currentPos;
-      startPos = currentPos;
-      desiredAngle = 0;
-      desiredDistance = 0;
-      */
-
       integralAngleError = 0;
       integralDistError = 0;
     }
@@ -351,8 +343,6 @@ void loop() {
   // web camera (angle and distance) to move to the target
   else if (state == DETECTED_STATE) {
     // If there is data on the buffer from the PI, read it.
-
-    int undetectCounter = 0;
     if (msgLength > 0) {
       if (offset == 1) {
         digitalWrite(LED_BUILTIN,instruction[0]);
@@ -663,6 +653,7 @@ void request() {
   }
  }
 
+// Receives data from the Raspberry Pi.
  void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
