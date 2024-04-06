@@ -1,7 +1,7 @@
-// Demo 2 Robot Localization and Control V4
+// Demo 2 Robot Localization and Control V2
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
-// Date: 3/30/2024
+// Date: 4/3/2024
 // ================
 // The purpose of this code is to design a controller
 // to move a robot based on data collected by a web 
@@ -225,12 +225,12 @@ void countEncoder2() {
 // Initializes pins, ISRs, and gives variables starting values before
 // running the motors and collecting data.
 void setup() {
-  // Initializes motor pins on the motor drive shield.
-
+  // Sets up Raspberry Pi to Arduino communication.
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
   Wire.onRequest(request);
-
+  
+  // Initializes motor pins on the motor drive shield.
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
     pinMode(MotorPinArray[i], OUTPUT);
   }
@@ -553,10 +553,6 @@ void loop() {
   // Inverted because motor 1 is on the left and motor 2 is on the right.
   Voltage[0] = (avgVolt - difVolt)/2;   // Motor 1
   Voltage[1] = (avgVolt + difVolt)/2;   // Motor 2
-/*
-  Serial.print(Voltage[0]);
-  Serial.print("\t");
-  Serial.println(Voltage[1]);*/
 
   // Sets speed and direction on motors.
   for (int k = 0; k < 2; k++) {
@@ -647,6 +643,7 @@ void request() {
   }
  }
 
+// Receives data from the Raspberry Pi.
  void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
@@ -659,4 +656,4 @@ void request() {
 
 // ================
 // CODE ENDS HERE
-// ================s
+// ================
