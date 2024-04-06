@@ -1,8 +1,10 @@
-// Demo 2 Robot Localization and Control V2.5 - TEST CODE
+// Demo 2 Robot Localization and Control V1.5 - TEST CODE
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
 // Date: 3/30/2024
 // ================
+// This code is test code without computer vision integration
+// to test the behavior of the robot and the FSM states.
 // The purpose of this code is to design a controller
 // to move a robot based on data collected by a web 
 // camera (from a Raspberry Pi) that is detecting an
@@ -12,9 +14,6 @@
 // and, based on the camera data, move to within 1 ft of
 // the marker. If doing task 2, another piece of code
 // in the program will run to have the robot move in a circle.
-
-// This code in particular was used for testing without computer vision
-// integration to confirm a proof of concept for the FSM machine.
 
 // DISCLAIMER:
 // This program assumes that the assembly of a robot structure,
@@ -652,7 +651,7 @@ void printReceived() {
   }
 }
 
-// Sends back quadrant if Pi needs to receive data from Arduino.
+// Receives data from the Raspberry Pi.
 void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
@@ -661,7 +660,6 @@ void receive() {
     instruction[msgLength] = Wire.read();
     msgLength++;
     reply = currentAngle;
-    //reply2 = currentPos;
   }
 }
 
