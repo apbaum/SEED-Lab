@@ -580,10 +580,6 @@ void loop() {
   // Inverted because motor 1 is on the left and motor 2 is on the right.
   Voltage[0] = (avgVolt - difVolt)/2;   // Motor 1
   Voltage[1] = (avgVolt + difVolt)/2;   // Motor 2
-/*
-  Serial.print(Voltage[0]);
-  Serial.print("\t");
-  Serial.println(Voltage[1]);*/
 
   // Sets speed and direction on motors.
   for (int k = 0; k < 2; k++) {
