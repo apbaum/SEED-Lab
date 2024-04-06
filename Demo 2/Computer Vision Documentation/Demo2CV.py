@@ -1,4 +1,9 @@
-#Distance Function by Zoe Karnisky and Adam Nussbaum
+#Demo 2 Computer Vision Code
+#Zoe Karnisky and Adam Nussbaum
+#SEEDLab Spring 2024
+#April 5, 2024
+
+#import the necessary libraries
 import cv2
 from cv2 import aruco
 import numpy as np
@@ -11,12 +16,11 @@ import struct
 
 
 # Initialise I2C bus.
-#i2cLCD = board.I2C()  # uses board.SCL and board.SDA
 prevAngle = 0
 x = 0
-distance = 0.0
+#distance = 0.0
 angle = 90.0
-ang_dist = [angle, distance]
+#ang_dist = [angle, distance]
 
 # I2C address of the Arduino, set in Arduino sketch
 ARD_ADDR = 8
@@ -24,7 +28,7 @@ ARD_ADDR = 8
 i2c = SMBus(1)
 offset = 0
 
-
+# Function to determine the angle of the aruco marker from the camera
 def angleBetween(markerCenter,frameWidth):
     HorFOV = 60.0
     relPos = (markerCenter - (frameWidth/2)) / (frameWidth/2)
@@ -36,6 +40,7 @@ def angleBetween(markerCenter,frameWidth):
 
     return int(angle)
 
+#Function to calculate the distance of the marker, which was not needed for demo 2, but we kept for use in the final project
 def distanceCalc(corners,matrix,distortCoeff):
     distanceConstant = 1.1
     rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, 10, matrix, distortCoeff)
@@ -44,7 +49,7 @@ def distanceCalc(corners,matrix,distortCoeff):
     distance = round(distance,1)
     return distance
     
-#Camera Calibration
+#Camera Calibration, which was determined from a separate camera calibration code
 matrix = np.array([[673.4502467, 0.000000000000000000e+00, 367.51306664],
 [0.000000000000000000e+00, 666.2405825 , 221.70408371],
 [0.000000000000000000e+00, 0.000000000000000000e+00, 1.000000000000000000e+00]])
@@ -74,32 +79,28 @@ while True:
     corners, ids, rejected = cv2.aruco.detectMarkers(image=undistImage,dictionary=aruco_dict)
     #print(ids)
 
-    if ids is not None:
+    if ids is not None: #If id has been read do the following
         for i in range(len(ids)):
 
-            centerMarker = (corners[0][0][0][0] + corners[0][0][1][0] + corners[0][0][2][0] + corners[0][0][3][0]) / 4
+            #Determines the location center of the marker
+            centerMarker = (corners[0][0][0][0] + corners[0][0][1][0] + corners[0][0][2][0] + corners[0][0][3][0]) / 4 
 
             angle = angleBetween(centerMarker,width)
             #q.put(angle)
             
-            if angle < (125) and angle > (-125): #checks that the angle is basically zero
+            if angle < (125) and angle > (-125): #checks that the angle is basically straight on using overflow
                 #send distance or run distance function
-                distance = distanceCalc(corners, matrix,distortCoeff)
-                ang_dist = [angle, distance]
-                print(angle)
-                #print(distance)
-                #print(ang_dist)
+                #distance = distanceCalc(corners, matrix,distortCoeff)
 
                 if angle < 0:
                     angle = (1 << 8) + angle  # Convert to 8-bit two's complement
 
                     # Ensure that the value is within the 8-bit range
                     angle &= 0xFF
-                #print(angle)
+                print(angle)
                     
-                
                 try:
-                    i2c.write_byte_data(ARD_ADDR,offset,angle) # Sends the angle and distance to the arduino
+                    i2c.write_byte_data(ARD_ADDR,offset,angle) # Sends the angle to the arduino
                     #i2c.write_byte_data(ARD_ADDR, offset, distance)
                     #data = bytearray(struct.pack("ff", angle, distance))  # '3B' indicates 3 unsigned bytes
 
@@ -111,13 +112,10 @@ while True:
                     print("Could not write data to the Arduino.")
 
             else:
-                #send angle to arduino
-                distance = 0
-           
-            
+                distance = 0   
     else:
         #continue
-        #send no marker
+        #No marker was detected
         print("No marker detected")
         
 
