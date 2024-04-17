@@ -1,4 +1,4 @@
-# Demo 2 Project Board
+# Demo 2 Redo Project Board
 ## Group 5: Electrical Elite
 <table class="tg">
 <thead>
