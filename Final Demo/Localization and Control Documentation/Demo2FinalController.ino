@@ -4,7 +4,7 @@
 // Date: 4/4/2024
 // ================
 // The purpose of this code is to design a controller
-// to move a robot based on data collected by a web 
+// to move a robot based on data collected by a web
 // camera (from a Raspberry Pi) that is detecting an
 // Aruco marker. If no data is collected, the robot will
 // rotate a set angle at defined intervals. When data
@@ -20,7 +20,7 @@
 // for additional info on the motor and motor driver shield
 // wiring configurations. The hardware configuration mentioned
 // here are the minimum requirements to use the program
-// as intended. 
+// as intended.
 
 // Hardware Required
 // ----------------
@@ -63,7 +63,7 @@
 #include <Wire.h>
 #define MY_ADDR 8
 volatile uint16_t offset = 0;
-double instruction[64] = {0};
+double instruction[64] = { 0 };
 volatile uint16_t msgLength = 0;
 char stringInput[64] = {};
 volatile uint8_t reply = 0;
@@ -75,14 +75,14 @@ unsigned long desired_Ts_ms = 10;
 unsigned long last_time_ms;
 unsigned long start_time_ms;
 bool startMove = false;
-bool task2 = false;
+bool task2 = true;
 
 // These variables keep track of the actual speed on the motors.
-float actual_speed[2] = {0, 0};
+float actual_speed[2] = { 0, 0 };
 
 // Assigns variables to keep track of the previous positions on
 // the encoders.
-float prev_pos[2] = {0, 0};
+float prev_pos[2] = { 0, 0 };
 
 // These variables are read from the Raspberry Pi to tell the robot
 // its current position.
@@ -122,24 +122,25 @@ float angleVelError = 0;
 float distanceVelError = 0;
 
 // Keeps track of the position of both motors in radians.
-long pos_counts[2] = {0, 0};
-float actual_pos[2] = {0, 0};
+long pos_counts[2] = { 0, 0 };
+float actual_pos[2] = { 0, 0 };
 
 // Sets motor pins and defines them in an array. Also determines
 // the voltage signs, motor voltage, and motor channels. This is
 // done to monitor the direction and speed on each motor.
 #define NUM_MOTOR_PINS 5
-int MotorPinArray[NUM_MOTOR_PINS] = {4, 7, 8, 9, 10};
-int Motor1Chan[2] = {2, 5};
-int Motor2Chan[2] = {3, 6};
-int VoltageSign[2] = {7,8};
-int MotorVoltage[2] = {9,10};
+int MotorPinArray[NUM_MOTOR_PINS] = { 4, 7, 8, 9, 10 };
+int Motor1Chan[2] = { 2, 5 };
+int Motor2Chan[2] = { 3, 6 };
+int VoltageSign[2] = { 7, 8 };
+int MotorVoltage[2] = { 9, 10 };
 
 // Initializes counting variables on the respective encoders.
-long counts[2] = {0, 0};
+long counts[2] = { 0, 0 };
 int counter;
 int detectCount = 0;
 int turn;
+float receivedDistance;
 
 // Defines the states and variables for a FSM. This model was
 // used to simplify how the code will run.
@@ -164,32 +165,32 @@ float instantRho = 0;
 float instantPhi = 0;
 
 // Variables to store change in distance and angle of robot.
-float currentdl[2] = {0,0};
-float lastdl[2] = {0,0};
+float currentdl[2] = { 0, 0 };
+float lastdl[2] = { 0, 0 };
 
 // Width of the robot and radius of the wheel. Both are in feet.
 float width = 0.9479;
 float radius = 0.26365;
 
 // Converts encoder counts to feet.
-double encClicksToFeet = 2*PI*radius/3200;
+double encClicksToFeet = 2 * PI * radius / 3200;
 
 // Defines variables for average voltage, difference voltage, voltage
 // to store in the motors, and PWM to write to the motors.
-float Voltage[2] = {0, 0};
-unsigned int PWM[2] = {0, 0};
+float Voltage[2] = { 0, 0 };
+unsigned int PWM[2] = { 0, 0 };
 float avgVolt = 0;
 float difVolt = 0;
 
-// Defines the Interrupt Service Routine for changes on channel A and 
+// Defines the Interrupt Service Routine for changes on channel A and
 // determining the rotation on the encoder. This ISR is for motor 1.
 void countEncoder1() {
-  // This condition decreases the likelihood of the ISR activating 
+  // This condition decreases the likelihood of the ISR activating
   // during a bounce in the encoder channel transitions.
   if (micros() - lastDebounceTime > debounceDelay) {
 
     // Counts up twice for a clockwise rotation on the encoder.
-    if (digitalRead(Motor1Chan[0]) == digitalRead(Motor1Chan[1])){
+    if (digitalRead(Motor1Chan[0]) == digitalRead(Motor1Chan[1])) {
       counts[0] += 2;
     }
     // Counts down twice for a counter-clockwise rotation on encoder.
@@ -202,15 +203,15 @@ void countEncoder1() {
   }
 }
 
-// Defines the Interrupt Service Routine for changes on channel A and 
+// Defines the Interrupt Service Routine for changes on channel A and
 // determining the rotation on the encoder. This ISR is for motor 2.
 void countEncoder2() {
-  // This condition decreases the likelihood of the ISR activating 
+  // This condition decreases the likelihood of the ISR activating
   // during a bounce in the encoder channel transitions.
   if (micros() - lastDebounceTime > debounceDelay) {
 
     // Counts up twice for a clockwise rotation on the encoder.
-    if (digitalRead(Motor2Chan[0]) == digitalRead(Motor2Chan[1])){
+    if (digitalRead(Motor2Chan[0]) == digitalRead(Motor2Chan[1])) {
       counts[1] += 2;
     }
     // Counts down twice for a counter-clockwise rotation on encoder.
@@ -228,7 +229,7 @@ void setup() {
   Wire.begin(MY_ADDR);
   Wire.onReceive(receive);
   Wire.onRequest(request);
-  
+
   // Initializes motor pins on the motor drive shield.
   for (int i = 0; i < NUM_MOTOR_PINS; i++) {
     pinMode(MotorPinArray[i], OUTPUT);
@@ -262,9 +263,10 @@ void setup() {
 }
 
 void loop() {
+  
   // These variables are the gains for the angle controller.
   float Kp_angle = 15;
-  float Ki_angle= 11;
+  float Ki_angle = 11;
   float angleVelKp = 4.5;
   float maxAngleVel = 4;
 
@@ -291,15 +293,15 @@ void loop() {
       desiredDistance = 0;
     }
   }
-  
+
   // LOCATE STATE
   // Turns until a marker is detected. If a marker is detected, goes to the next state.
   else if (state == LOCATE_STATE) {
     // Sets turning amount until marker is detected.
-    TARGET_ANGLE_DEG = 45 + 45*turn;
+    TARGET_ANGLE_DEG = 45 + 45 * turn;
     TARGET_DISTANCE = robotDistance;
     riseTimeAngle = 2;
-    angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
+    angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
 
     // Simulates a ramp input for the desired angle. The robot will keep spinning
     // until a marker is detected.
@@ -308,7 +310,7 @@ void loop() {
     // If there is data on the buffer from the PI, read it.
     if (msgLength > 0) {
       if (offset == 1) {
-        digitalWrite(LED_BUILTIN,instruction[0]);
+        digitalWrite(LED_BUILTIN, instruction[0]);
       }
       printReceived();
       msgLength = 0;
@@ -342,15 +344,15 @@ void loop() {
         counter = 0;
       }
     }
-  } 
+  }
 
   // LINE UP STATE
   // Makes sure the robot is lined up correctly after correcting for angle read by web camera.
   else if (state == LINE_UP_STATE) {
     // Delays the robot to stabilize the camera.
-    if (detectCount < 100){
-        detectCount++;
-    } 
+    if (detectCount < 100) {
+      detectCount++;
+    }
 
     // Reads data about the angle and corrects to the angle.
     else {
@@ -358,7 +360,7 @@ void loop() {
       if (detectCount == 101) {
         if (msgLength > 0) {
           if (offset == 1) {
-            digitalWrite(LED_BUILTIN,instruction[0]);
+            digitalWrite(LED_BUILTIN, instruction[0]);
           }
           printReceived();
           msgLength = 0;
@@ -366,11 +368,11 @@ void loop() {
           // Tells robot it detected marker.
           detected = true;
         }
-        desiredAngle = currentAngle; 
+        desiredAngle = currentAngle;
       }
 
       // If the angle is within a good range, go to the next state.
-      if (abs(robotAngle-desiredAngle) < 0.5){
+      if (abs(robotAngle - desiredAngle) < 0.5) {
         state = MOVE_STATE;
         robotAngle = 0;
         desiredAngle = 0;
@@ -382,23 +384,24 @@ void loop() {
   // Moves the robot a set distance towards a marker.
   else if (state == MOVE_STATE) {
     // Sets target target distance.
-      TARGET_DISTANCE = 7;
+    float addedCalibration = 0.26;
+    float multipliedCalibration = 0.89;
+    TARGET_DISTANCE = receivedDistance * multipliedCalibration + addedCalibration;
 
-      // Sets up ramp function rises for the distance.
-      riseTimeDist = 10;
-      distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
+    // Sets up ramp function rises for the distance.
+    riseTimeDist = 5;
+    distanceRise = TARGET_DISTANCE / (riseTimeDist * 1000) * desired_Ts_ms;
 
-      // Simulates a ramp input for the desired distance. Only
-      // activates when angle is set.
-      if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
-        desiredDistance = TARGET_DISTANCE;
-      }
-      else {
-        desiredDistance = desiredDistance + distanceRise;
-      }
-    
+    // Simulates a ramp input for the desired distance. Only
+    // activates when angle is set.
+    if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
+      desiredDistance = TARGET_DISTANCE;
+    } else {
+      desiredDistance = desiredDistance + distanceRise;
+    }
+
     // If the camera reads that the robot is within 1 ft. Goes to
-    // next state if task 2. 
+    // next state if task 2.
     if (abs(TARGET_DISTANCE - robotDistance) <= 1) {
       // Resets the variables for current position and angle for the next state.
       counter = 0;
@@ -415,7 +418,7 @@ void loop() {
       TARGET_ANGLE_DEG = 0;
       integralAngleError = 0;
       integralDistError = 0;
-      
+
       // Goes to 90 degree turn if task 2.
       if (task2 == true) {
         state = TURN_90_STATE;
@@ -437,11 +440,11 @@ void loop() {
     TARGET_ANGLE_DEG = -90;
     TARGET_DISTANCE = 0;
     riseTimeAngle = 1;
-    angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
-    
-    // Simulates a ramp input for the desired angle. 
-    if (abs(desiredAngle) >= abs(TARGET_ANGLE_DEG*PI/180)) {
-      desiredAngle = TARGET_ANGLE_DEG*PI/180;
+    angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
+
+    // Simulates a ramp input for the desired angle.
+    if (abs(desiredAngle) >= abs(TARGET_ANGLE_DEG * PI / 180)) {
+      desiredAngle = TARGET_ANGLE_DEG * PI / 180;
     }
     // End of ramp function.
     else {
@@ -449,7 +452,7 @@ void loop() {
     }
 
     // Once the robot turns 90 degrees clockwise,
-    // goes to the next state. 
+    // goes to the next state.
     if ((startMove == true) && (task2 == true)) {
       desiredAngle = 0;
       desiredDistance = 0;
@@ -469,28 +472,26 @@ void loop() {
   // Makes the robot move in a circle at some radius.
   else if (state == CIRCLE_STATE) {
     float turnRadius = 1;
-    TARGET_DISTANCE = 2*PI*turnRadius;
+    TARGET_DISTANCE = 2 * PI * turnRadius;
     TARGET_ANGLE_DEG = 360 + 40;
 
     // Sets up ramp function rises for the distance and angle.
     riseTimeDist = 6;
     riseTimeAngle = 6;
-    distanceRise = TARGET_DISTANCE/(riseTimeDist * 1000) * desired_Ts_ms;
-    angleRise = TARGET_ANGLE_DEG*PI/180/(riseTimeAngle * 1000) * desired_Ts_ms;
+    distanceRise = TARGET_DISTANCE / (riseTimeDist * 1000) * desired_Ts_ms;
+    angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
 
-    // Simulates a ramp input for the desired angle. 
-    if (abs(desiredAngle) >= abs(TARGET_ANGLE_DEG*PI/180)) {
-      desiredAngle = TARGET_ANGLE_DEG*PI/180;
-    }
-    else {
+    // Simulates a ramp input for the desired angle.
+    if (abs(desiredAngle) >= abs(TARGET_ANGLE_DEG * PI / 180)) {
+      desiredAngle = TARGET_ANGLE_DEG * PI / 180;
+    } else {
       desiredAngle = desiredAngle + angleRise;
     }
 
     // Simulates a ramp input for the desired distance.
     if (abs(desiredDistance) >= abs(TARGET_DISTANCE)) {
       desiredDistance = TARGET_DISTANCE;
-    }
-    else {
+    } else {
       desiredDistance = desiredDistance + distanceRise;
     }
   }
@@ -506,12 +507,12 @@ void loop() {
 
   // Updates last time program ran.
   last_time_ms = millis();
-  
+
   // Calculates the robot distance and angle.
   // Distance is in feet and angle is in radians.
-  robotDistance = prevRobotDistance + (currentdl[0] - lastdl[0] + currentdl[1] - lastdl[1])/2;
-  robotAngle = prevRobotAngle - (currentdl[0] - lastdl[0] - currentdl[1] + lastdl[1])/width;
-  
+  robotDistance = prevRobotDistance + (currentdl[0] - lastdl[0] + currentdl[1] - lastdl[1]) / 2;
+  robotAngle = prevRobotAngle - (currentdl[0] - lastdl[0] - currentdl[1] + lastdl[1]) / width;
+
   // Updates previous variables for distance and angle.
   prevRobotDistance = robotDistance;
   prevRobotAngle = robotAngle;
@@ -523,28 +524,28 @@ void loop() {
   // Calculates the current positions on the motors in radians.
   for (int i = 0; i < 2; i++) {
     pos_counts[i] = myEnc(i + 1);
-    actual_pos[i] = 2*PI*(float)pos_counts[i]/3200;
+    actual_pos[i] = 2 * PI * (float)pos_counts[i] / 3200;
 
     // Calculates the actual velocities in rad/sec on the motors.
-    actual_speed[i] = (actual_pos[i] - prev_pos[i])/((float)desired_Ts_ms/1000);
+    actual_speed[i] = (actual_pos[i] - prev_pos[i]) / ((float)desired_Ts_ms / 1000);
     prev_pos[i] = actual_pos[i];
   }
 
   // Calculates instantaneous forward velocity and rotational velocity.
-  instantRho = radius*(actual_speed[1] + actual_speed[0])/2;
-  instantPhi = radius*(actual_speed[1] - actual_speed[0])/width; 
+  instantRho = radius * (actual_speed[1] + actual_speed[0]) / 2;
+  instantPhi = radius * (actual_speed[1] - actual_speed[0]) / width;
 
   // Calculates the phi error (angle) and rho error (distance).
   distanceError = desiredDistance - robotDistance;
   angleError = desiredAngle - robotAngle;
 
   // Calculates the desired angular velocity.
-  integralAngleError = integralAngleError + angleError*((float)desired_Ts_ms / 1000);
+  integralAngleError = integralAngleError + angleError * ((float)desired_Ts_ms / 1000);
   desiredAngleVel = Kp_angle * angleError + Ki_angle * integralAngleError;
   angleVelError = desiredAngleVel - instantPhi;
 
   // Calculates the desired position velocity.
-  integralDistError = integralDistError + distanceError*((float)desired_Ts_ms / 1000);
+  integralDistError = integralDistError + distanceError * ((float)desired_Ts_ms / 1000);
   desiredDistVel = Kp_distance * distanceError + Ki_distance * integralDistError;
 
   // Ensures the forward velocity is not above a large amount.
@@ -556,7 +557,7 @@ void loop() {
   // Ensures the rotational velocity is not above a large amount.
   if (abs(desiredAngleVel) >= maxAngleVel) {
     desiredAngleVel = sgn(desiredAngleVel) * maxAngleVel;
-  } 
+  }
   angleVelError = desiredAngleVel - instantPhi;
 
   // Calculates the average and difference voltages.
@@ -565,31 +566,29 @@ void loop() {
 
   // Starts moving robot forward when the angle is set.
   // Sets a counter to ensure system is stable.
-  if (abs(TARGET_ANGLE_DEG*PI/180 - robotAngle) < 0.01) {
+  if (abs(TARGET_ANGLE_DEG * PI / 180 - robotAngle) < 0.01) {
     counter = counter + 1;
-  } 
-  else {
+  } else {
     counter = 0;
   }
 
   // If the counter is hit, will start moving the robot forward.
-  if (counter > 20){
+  if (counter > 20) {
     startMove = true;
   }
-// Sets the voltage on the motors based on the average and difference voltages.
+  // Sets the voltage on the motors based on the average and difference voltages.
   // Inverted because motor 1 is on the left and motor 2 is on the right.
-  Voltage[0] = (avgVolt - difVolt)/2;   // Motor 1
-  Voltage[1] = (avgVolt + difVolt)/2;   // Motor 2
+  Voltage[0] = (avgVolt - difVolt) / 2;  // Motor 1
+  Voltage[1] = (avgVolt + difVolt) / 2;  // Motor 2
 
   // Sets speed and direction on motors.
   for (int k = 0; k < 2; k++) {
     if (Voltage[k] > 0) {
       // Rotates the motors forward.
-      digitalWrite(VoltageSign[k], HIGH);  
-    }
-    else {
+      digitalWrite(VoltageSign[k], HIGH);
+    } else {
       // Rotates the motors backward.
-      digitalWrite(VoltageSign[k], LOW);  
+      digitalWrite(VoltageSign[k], LOW);
     }
 
     // Saturates the voltage to be within the batter voltage range.
@@ -613,14 +612,13 @@ void loop() {
 // ================
 
 // Adjusts the count on the channels to be more precise for both
-// motors 1 and 2. 
+// motors 1 and 2.
 long myEnc(int motor) {
   // Activates to adjust the count on the motor 1 encoder.
   if (motor == 1) {
     if (digitalRead(Motor1Chan[0]) != digitalRead(Motor1Chan[1])) {
       return (counts[0] + 1);
-    }
-    else {
+    } else {
       return counts[0];
     }
   }
@@ -629,22 +627,25 @@ long myEnc(int motor) {
   else if (motor == 2) {
     if (digitalRead(Motor2Chan[0]) != digitalRead(Motor2Chan[1])) {
       return (counts[1] + 1);
-    }
-    else {
+    } else {
       return counts[1];
-    }  
+    }
   }
 }
 
 // Sets what data will be received by Pi for data communication.
-void printReceived() {
+void printReceived() { 
   for (int i = 0; i < msgLength; i++) {
     stringInput[i] = instruction[i];
-    currentAngle = instruction[i];
-    if ((int)currentAngle & 0x80) {
-      currentAngle = -((~(int)currentAngle + 1) & 0x7F);
+    if (i%2 == 0){
+      currentAngle = instruction[i];
+      if ((int)currentAngle & 0x80) {
+        currentAngle = -((~(int)currentAngle + 1) & 0x7F);
+      }
+      currentAngle = currentAngle / 10;
+    } else if (i == 1){
+        receivedDistance = instruction[i]/10;
     }
-    currentAngle = currentAngle/10;
   }
 }
 
@@ -655,23 +656,21 @@ void request() {
   // https://github.com/arduino/ArduinoCore-avr/blob/master/libraries/Wire/src/Wire.cpp
   Wire.write(reply);
   reply = 0;
- }
+}
 
- // Returns a sign of the value.
- int sgn(float value) {
+// Returns a sign of the value.
+int sgn(float value) {
   if (value > 0) {
     return 1;
-  }
-  else if (value < 0) {
+  } else if (value < 0) {
     return -1;
-  }
-  else {
+  } else {
     return 0;
   }
- }
+}
 
 // Receives data from Raspberry Pi
- void receive() {
+void receive() {
   // Set the offset, this will always be the first byte.
   offset = Wire.read();
   // If there is information after the offset, it is telling us more about the command.
