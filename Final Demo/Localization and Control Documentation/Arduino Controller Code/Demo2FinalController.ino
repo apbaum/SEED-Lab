@@ -258,7 +258,7 @@ void setup() {
   start_time_ms = last_time_ms;
   desiredAngle = 0;
   desiredDistance = 0;
-  state = IDLE_STATE;
+  state = TURN_90_STATE;
   counter = 0;
 }
 
@@ -437,7 +437,7 @@ void loop() {
   // clockwise to prepare for circle.
   else if (state == TURN_90_STATE) {
     // Sets angle parameters.
-    TARGET_ANGLE_DEG = -90;
+    TARGET_ANGLE_DEG = -95;
     TARGET_DISTANCE = 0;
     riseTimeAngle = 1;
     angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
@@ -476,7 +476,7 @@ void loop() {
     TARGET_ANGLE_DEG = 360 + 40;
 
     // Sets up ramp function rises for the distance and angle.
-    riseTimeDist = 6;
+    riseTimeDist = 4;
     riseTimeAngle = 6;
     distanceRise = TARGET_DISTANCE / (riseTimeDist * 1000) * desired_Ts_ms;
     angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
@@ -573,7 +573,7 @@ void loop() {
   }
 
   // If the counter is hit, will start moving the robot forward.
-  if (counter > 20) {
+  if (counter > 5) {
     startMove = true;
   }
   // Sets the voltage on the motors based on the average and difference voltages.
