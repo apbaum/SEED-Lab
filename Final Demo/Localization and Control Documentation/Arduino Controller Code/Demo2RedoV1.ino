@@ -1,7 +1,7 @@
-// Demo 2 Redo Robot Controller V2
+// Demo 2 Redo Robot Controller V1
 // ================
 // Authors: Madeleine Houghton and Quinn Hejmanowski
-// Date: 4/21/2024
+// Date: 4/4/2024
 // ================
 // The purpose of this code is to design a controller
 // to move a robot based on data collected by a web
@@ -74,7 +74,6 @@ bool start = true;
 unsigned long desired_Ts_ms = 10;
 unsigned long last_time_ms;
 unsigned long start_time_ms;
-float current_time;
 bool startMove = false;
 bool task2 = true;
 
@@ -142,7 +141,6 @@ int counter;
 int detectCount = 0;
 int turn;
 float receivedDistance;
-float startCircleTime = 0;
 
 // Defines the states and variables for a FSM. This model was
 // used to simplify how the code will run.
@@ -374,7 +372,7 @@ void loop() {
       }
 
       // If the angle is within a good range, go to the next state.
-      if (abs(robotAngle - (desiredAngle*PI/180)) < 0.5) {
+      if (abs(robotAngle - desiredAngle) < 0.5) {
         state = MOVE_STATE;
         robotAngle = 0;
         desiredAngle = 0;
@@ -460,9 +458,6 @@ void loop() {
       desiredDistance = 0;
       state = CIRCLE_STATE;
 
-      // Sets circle timer.
-      startCircleTime = current_time;
-
       // To perform circle correctly, reset location.
       counts[0] = 0;
       counts[1] = 0;
@@ -499,27 +494,6 @@ void loop() {
     } else {
       desiredDistance = desiredDistance + distanceRise;
     }
-
-    // Puts the robot back to idle once it completes a circle.
-    if ((current_time - startCircleTime) >= 5.79) {
-      start = false;
-      state = IDLE_STATE;
-      counter = 0;
-      desiredAngle = 0;
-      desiredDistance = 0;
-      startMove = false;
-      counts[0] = 0;
-      counts[1] = 0;
-      lastdl[0] = 0;
-      lastdl[1] = 0;
-      prevRobotDistance = 0;
-      prevRobotAngle = 0;
-      TARGET_DISTANCE = 0;
-      TARGET_ANGLE_DEG = 0;
-      integralAngleError = 0;
-      integralDistError = 0;
-    }
-
   }
 
   // By default goes to idle state.
@@ -533,9 +507,6 @@ void loop() {
 
   // Updates last time program ran.
   last_time_ms = millis();
-
-  // Calculates the current time of the program.
-  current_time = (float)(last_time_ms - start_time_ms)/1000;
 
   // Calculates the robot distance and angle.
   // Distance is in feet and angle is in radians.
@@ -597,13 +568,12 @@ void loop() {
   // Sets a counter to ensure system is stable.
   if (abs(TARGET_ANGLE_DEG * PI / 180 - robotAngle) < 0.01) {
     counter = counter + 1;
-  } 
-  else {
+  } else {
     counter = 0;
   }
 
   // If the counter is hit, will start moving the robot forward.
-  if (counter > 1) {
+  if (counter > 5) {
     startMove = true;
   }
   // Sets the voltage on the motors based on the average and difference voltages.
