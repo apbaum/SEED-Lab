@@ -76,7 +76,7 @@ unsigned long last_time_ms;
 unsigned long start_time_ms;
 float current_time;
 bool startMove = false;
-bool task2 = true;
+bool task2 = false;
 
 // These variables keep track of the actual speed on the motors.
 float actual_speed[2] = { 0, 0 };
@@ -260,7 +260,7 @@ void setup() {
   start_time_ms = last_time_ms;
   desiredAngle = 0;
   desiredDistance = 0;
-  state = MOVE_STATE;
+  state = IDLE_STATE;
   counter = 0;
 }
 
@@ -300,7 +300,7 @@ void loop() {
   // Turns until a marker is detected. If a marker is detected, goes to the next state.
   else if (state == LOCATE_STATE) {
     // Sets turning amount until marker is detected.
-    TARGET_ANGLE_DEG = 45;
+    TARGET_ANGLE_DEG = 60;
     TARGET_DISTANCE = robotDistance;
     riseTimeAngle = 2;
     angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
@@ -386,10 +386,10 @@ void loop() {
   // MOVE STATE
   // Moves the robot a set distance towards a marker.
   else if (state == MOVE_STATE) {
+    printReceived();
     if (counter == 0){
         float addedCalibration = 0.2;
         float multipliedCalibration = 0.875;
-        receivedDistance = 6;
         TARGET_DISTANCE = multipliedCalibration * receivedDistance + addedCalibration;
         counter++;
     }
