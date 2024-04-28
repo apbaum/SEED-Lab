@@ -76,7 +76,8 @@ unsigned long last_time_ms;
 unsigned long start_time_ms;
 float current_time;
 bool startMove = false;
-bool task2 = false;
+bool task2 = true;
+int direction = 1;
 
 // These variables keep track of the actual speed on the motors.
 float actual_speed[2] = { 0, 0 };
@@ -140,7 +141,6 @@ int MotorVoltage[2] = { 9, 10 };
 long counts[2] = { 0, 0 };
 int counter = 0;
 int detectCount = 0;
-int turn;
 float receivedDistance;
 float startCircleTime = 0;
 
@@ -281,6 +281,10 @@ void loop() {
   // Defines max battery voltage
   float Battery_Voltage = 7.8;
 
+  // Converts the encoder counts to feet.
+  currentdl[0] = (double)myEnc(1) * encClicksToFeet;
+  currentdl[1] = (double)myEnc(2) * encClicksToFeet;
+
   // IDLE STATE
   // In this state, it moves straight to the next state after resetting variables.
   if (state == IDLE_STATE) {
@@ -300,7 +304,7 @@ void loop() {
   // Turns until a marker is detected. If a marker is detected, goes to the next state.
   else if (state == LOCATE_STATE) {
     // Sets turning amount until marker is detected.
-    TARGET_ANGLE_DEG = 60;
+    TARGET_ANGLE_DEG = direction*60;
     TARGET_DISTANCE = robotDistance;
     riseTimeAngle = 2;
     angleRise = TARGET_ANGLE_DEG * PI / 180 / (riseTimeAngle * 1000) * desired_Ts_ms;
@@ -341,7 +345,6 @@ void loop() {
     // the robot turn again.
     else {
       if (startMove == true) {
-        turn = turn + 1;
         startMove = false;
         counter = 0;
       }
@@ -352,14 +355,14 @@ void loop() {
   // Makes sure the robot is lined up correctly after correcting for angle read by web camera.
   else if (state == LINE_UP_STATE) {
     // Delays the robot to stabilize the camera.
-    if (detectCount < 100) {
+    if (detectCount < 110) {
       detectCount++;
     }
 
     // Reads data about the angle and corrects to the angle.
     else {
       // Reads angle from web camera once.
-      if (detectCount == 101) {
+      if (detectCount >= 100) {
         if (msgLength > 0) {
           if (offset == 1) {
             digitalWrite(LED_BUILTIN, instruction[0]);
@@ -379,6 +382,7 @@ void loop() {
         robotAngle = 0;
         desiredAngle = 0;
         counter = 0;
+        printReceived();
       }
     }
   }
@@ -386,20 +390,24 @@ void loop() {
   // MOVE STATE
   // Moves the robot a set distance towards a marker.
   else if (state == MOVE_STATE) {
-    printReceived();
-    if (counter == 0){
-        float addedCalibration = 0.2;
-        float multipliedCalibration = 0.875;
-        TARGET_DISTANCE = multipliedCalibration * receivedDistance + addedCalibration;
-        counter++;
+
+    float addedCalibration = 0.44;
+    float multipliedCalibration = 0.9;
+    if (receivedDistance > 7.5){
+      addedCalibration = .2;
     }
+    if (direction == -1){
+      addedCalibration = 1.2;
+      multipliedCalibration = 0.75;
+    } 
+    TARGET_DISTANCE = multipliedCalibration * receivedDistance + addedCalibration;
 
     // Sets up ramp function rises for the distance.
     riseTimeDist = 2.5;
     if (task2 == true) {
       riseTimeDist = 5;
       maxDistVel = 3;
-      TARGET_DISTANCE = receivedDistance * 0.875 + 0.6;
+      TARGET_DISTANCE = receivedDistance * 0.875 + 0.65;
     }
     distanceRise = TARGET_DISTANCE / (riseTimeDist * 1000) * desired_Ts_ms;
 
@@ -482,6 +490,7 @@ void loop() {
       lastdl[1] = 0;
       prevRobotDistance = 0;
       prevRobotAngle = 0;
+      robotDistance = 0;
     }
   }
 
@@ -515,7 +524,7 @@ void loop() {
     }
 
     // Puts the robot back to idle once it completes a circle.
-    if ((current_time - startCircleTime) > 3.95) {
+    if (robotDistance >= 6.05) {
       start = false;
       state = IDLE_STATE;
       counter = 0;
@@ -540,10 +549,6 @@ void loop() {
   else {
     state = IDLE_STATE;
   }
-
-  // Converts the encoder counts to feet.
-  currentdl[0] = (double)myEnc(1) * encClicksToFeet;
-  currentdl[1] = (double)myEnc(2) * encClicksToFeet;
 
   // Updates last time program ran.
   last_time_ms = millis();
