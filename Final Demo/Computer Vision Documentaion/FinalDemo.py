@@ -1,7 +1,9 @@
-#Demo 2 Redo Computer Vision Code
-#Zoe Karnisky and Adam Nussbaum
+# Demo 2 Redo Computer Vision Code
+# Zoe Karnisky and Adam Nussbaum
+# The purpose of the code is to read a distance and angle based on the detection of an Aruco marker
+# and send the measurements to the Arduino through the Raspberry Pi.
 
-#Import necessary libraries
+# Import necessary libraries
 import cv2
 from cv2 import aruco
 import numpy as np
@@ -13,7 +15,7 @@ from smbus2 import SMBus
 import struct
 
 
-#Initialize necessary variables
+# Initialize necessary variables
 distance = 0.0
 angle = 90.0
 ang_dist = [angle, distance]
@@ -36,7 +38,7 @@ def angleBetween(markerCenter,frameWidth):
 
     return int(angle)
 
-#Function for determing the distance of the marker
+# Function for determing the distance of the marker
 def distanceCalc(corners,matrix,distortCoeff):
     distanceConstant = 35.29
     rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, 10, matrix, distortCoeff)
@@ -45,14 +47,14 @@ def distanceCalc(corners,matrix,distortCoeff):
     
     return int(distance)
     
-#Camera Calibration
+# Camera Calibration
 matrix = np.array([[673.4502467, 0.000000000000000000e+00, 367.51306664],
 [0.000000000000000000e+00, 666.2405825 , 221.70408371],
 [0.000000000000000000e+00, 0.000000000000000000e+00, 1.000000000000000000e+00]])
 distortCoeff = np.array([[ 0.08976875, -0.53677562, -0.01045482,  0.01121468, 0.19515169]])
 
 
-#Initialize Camera properties
+# Initialize Camera properties
 camera = cv2.VideoCapture(0) 
 camera.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
@@ -70,7 +72,7 @@ while True:
         break
     grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    #Undistorting the image
+    # Undistorting the image
     height,width = image.shape[:2]
     camMatrixNew,roi = cv2.getOptimalNewCameraMatrix(matrix, distortCoeff, (width, height), 1, (width,height))
     undistImage = cv2.undistort(grey, matrix, distortCoeff, None, camMatrixNew)
@@ -84,13 +86,13 @@ while True:
 
             centerMarker = (corners[0][0][0][0] + corners[0][0][1][0] + corners[0][0][2][0] + corners[0][0][3][0]) / 4
 
-            #Calculate angle
+            # Calculate angle
             angle = angleBetween(centerMarker,width)
 
             #print(ids)                 
             
             if angle < (500) and angle > (-500): #checks that the angle is basically zero
-                #Calculate distance
+                # Calculate distance
                 distance = distanceCalc(corners, matrix,distortCoeff)
                
                 if angle < 0:
@@ -104,7 +106,7 @@ while True:
                 print(ang_dist)
                     
                 try:
-                    #Send the angle and distance to the arduino
+                    # Send the angle and distance to the arduino
                     i2c.write_i2c_block_data(ARD_ADDR, offset, ang_dist)
                 except IOError:
                     print("Could not write data to the Arduino.")
@@ -125,6 +127,6 @@ while True:
     k = cv2.waitKey(1) & 0xFF
     if k == ord("q"):
         break
-#Release the camera
+# Release the camera
 camera.release()
 cv2.destroyAllWindows()
