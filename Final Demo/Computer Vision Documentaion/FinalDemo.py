@@ -1,4 +1,7 @@
-#Distance Function by Zoe Karnisky and Adam Nussbaum
+#Demo 2 Redo Computer Vision Code
+#Zoe Karnisky and Adam Nussbaum
+
+#Import necessary libraries
 import cv2
 from cv2 import aruco
 import numpy as np
@@ -10,10 +13,7 @@ from smbus2 import SMBus
 import struct
 
 
-# Initialise I2C bus.
-#i2cLCD = board.I2C()  # uses board.SCL and board.SDA
-prevAngle = 0
-x = 0
+#Initialize necessary variables
 distance = 0.0
 angle = 90.0
 ang_dist = [angle, distance]
@@ -24,7 +24,7 @@ ARD_ADDR = 8
 i2c = SMBus(1)
 offset = 0
 
-
+# Function for determining the angle of the marker 
 def angleBetween(markerCenter,frameWidth):
     HorFOV = 60.0
     relPos = (markerCenter - (frameWidth/2)) / (frameWidth/2)
@@ -36,12 +36,11 @@ def angleBetween(markerCenter,frameWidth):
 
     return int(angle)
 
+#Function for determing the distance of the marker
 def distanceCalc(corners,matrix,distortCoeff):
     distanceConstant = 35.29
     rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, 10, matrix, distortCoeff)
     distance = np.linalg.norm(tvec) / distanceConstant
-    #distance = distance / 30.48
-    #distance = round(distance,1)
     distance = distance * 10
     
     return int(distance)
@@ -53,16 +52,14 @@ matrix = np.array([[673.4502467, 0.000000000000000000e+00, 367.51306664],
 distortCoeff = np.array([[ 0.08976875, -0.53677562, -0.01045482,  0.01121468, 0.19515169]])
 
 
-#Initialize Camera
+#Initialize Camera properties
 camera = cv2.VideoCapture(0) 
 camera.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 camera.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
-#camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)
 camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
 camera.set(cv2.CAP_PROP_BRIGHTNESS, 250)
 camera.set(cv2.CAP_PROP_EXPOSURE, 39)
 camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-#camera.set(cv2.CAP_PROP_CONTRAST, 5)
 camera.set(cv2.CAP_PROP_FPS,120)
 
 # Load the ArUco dictionary
@@ -71,7 +68,6 @@ while True:
     ret,image = camera.read() # Takes an image and stores it in frame
     if not ret:
         break
-    #sleep(.5) # wait for image to stabilize
     grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     #Undistorting the image
@@ -88,15 +84,15 @@ while True:
 
             centerMarker = (corners[0][0][0][0] + corners[0][0][1][0] + corners[0][0][2][0] + corners[0][0][3][0]) / 4
 
+            #Calculate angle
             angle = angleBetween(centerMarker,width)
 
             #print(ids)                 
             
             if angle < (500) and angle > (-500): #checks that the angle is basically zero
-                #run distance function
+                #Calculate distance
                 distance = distanceCalc(corners, matrix,distortCoeff)
                
-
                 if angle < 0:
                     angle = (1 << 8) + angle  # Convert to 8-bit two's complement
 
@@ -107,17 +103,13 @@ while True:
                 ang_dist = [angle, distance]
                 print(ang_dist)
                     
-                
                 try:
-                    # Send the data
-                    #print(data)
+                    #Send the angle and distance to the arduino
                     i2c.write_i2c_block_data(ARD_ADDR, offset, ang_dist)
-                    #i2c.write_byte_data(ARD_ADDR, offset, ang_dist)
                 except IOError:
                     print("Could not write data to the Arduino.")
 
             else:
-                #send angle to arduino
                 distance = 0
            
             
@@ -126,7 +118,6 @@ while True:
         #send no marker
         #print("No marker detected")
         
-
     #cv2.drawMarker(undistImage, (image.shape[1] // 2, image.shape[0] // 2), (0, 255, 0), cv2.MARKER_CROSS, 10, 2)
 
     #cv2.imshow("Image",undistImage)
@@ -134,8 +125,6 @@ while True:
     k = cv2.waitKey(1) & 0xFF
     if k == ord("q"):
         break
-
-   
-
+#Release the camera
 camera.release()
 cv2.destroyAllWindows()
