@@ -391,10 +391,13 @@ void loop() {
   // Moves the robot a set distance towards a marker.
   else if (state == MOVE_STATE) {
 
+    // Calibrates distance to deal with slip.
     float addedCalibration = 0.44;
     float multipliedCalibration = 0.9;
+
+    // Adjusts calibration based on direction turn.
     if (receivedDistance > 7.5){
-      addedCalibration = .2;
+      addedCalibration = 0.2;
     }
     if (direction == -1){
       addedCalibration = 1.2;
