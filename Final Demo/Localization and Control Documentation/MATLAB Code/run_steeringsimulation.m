@@ -1,4 +1,4 @@
-% Demo 2: run_steeringsimulation
+% Demo 2 Redo: run_steeringsimulation
 % Adapted by Madeleine Houghton
 %
 % Runs a simulation of a two wheeled robot with a forward motion and anglual
